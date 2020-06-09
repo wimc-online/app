@@ -1,0 +1,7 @@
+{
+  "name": "wimc-app",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "react"
+}
