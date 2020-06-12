@@ -2,9 +2,9 @@ import Menu from './components/Menu';
 import Page from './pages/Page';
 import LoginPage from './pages/auth/LoginPage';
 import React from 'react';
-import { IonApp, IonRouterOutlet, IonSplitPane } from '@ionic/react';
-import { IonReactRouter } from '@ionic/react-router';
-import { Redirect, Route } from 'react-router-dom';
+import {IonApp, IonRouterOutlet, IonSplitPane} from '@ionic/react';
+import {IonReactRouter} from '@ionic/react-router';
+import {Route} from 'react-router-dom';
 
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/react/css/core.css';
@@ -27,21 +27,20 @@ import './theme/variables.scss';
 import './theme/global.scss';
 
 const App: React.FC = () => {
-
-  return (
-    <IonApp>
-      <IonReactRouter>
-        <IonSplitPane contentId="main">
-          <Menu />
-          <IonRouterOutlet id="main">
-            <Route path="/page/:name" component={Page} exact />
-            <Route path="/login" component={LoginPage} exact />
-            <Redirect from="/" to="/login" exact />
-          </IonRouterOutlet>
-        </IonSplitPane>
-      </IonReactRouter>
-    </IonApp>
-  );
+    return (
+        <IonApp>
+            <IonReactRouter>
+                <IonSplitPane contentId="main">
+                    <Menu/>
+                    <IonRouterOutlet id="main">
+                        <Route path="/page/:name" component={Page}/>
+                        <Route path="/login" component={LoginPage}/>
+                        {/*<Redirect from="/" to="/login"/>*/}
+                    </IonRouterOutlet>
+                </IonSplitPane>
+            </IonReactRouter>
+        </IonApp>
+    );
 };
 
 export default App;
