@@ -1,7 +1,7 @@
 {
   "realm": "wimc",
-  "auth-server-url": "http://keycloak.wimc.localhost/auth/",
-  "ssl-required": "none",
+  "auth-server-url": "https://auth.wimc.localhost/auth/",
+  "ssl-required": "external",
   "resource": "wimc",
   "public-client": true,
   "confidential-port": 0

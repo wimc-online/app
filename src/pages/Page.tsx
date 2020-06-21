@@ -3,6 +3,7 @@ import React, {Component, Props} from 'react';
 import Keycloak from "keycloak-js";
 import {useParams} from 'react-router';
 import ExploreContainer from '../components/ExploreContainer';
+import ApiCall from '../components/ApiCall';
 import './Page.scss';
 
 
@@ -51,8 +52,10 @@ class Page extends React.Component<any, any> {
                         </IonToolbar>
                     </IonHeader>
                     <h2>{this.state.authenticated ? 'authenticated' : 'not authenticated'}</h2>
-                    <ExploreContainer name="testName" authenticated={this.state.authenticated}
+                    <ExploreContainer name="testName"
+                                      authenticated={this.state.authenticated}
                                       keycloak={this.state.keycloak}/>
+                    <ApiCall/>
                 </IonContent>
             </IonPage>
         )
