@@ -1,39 +1,32 @@
 import {IonButtons, IonContent, IonHeader, IonMenuButton, IonPage, IonTitle, IonToolbar} from '@ionic/react';
-import React, {Component, Props} from 'react';
-import Keycloak from "keycloak-js";
+import React, {useState, useEffect} from 'react';
 import {useParams} from 'react-router';
 import ExploreContainer from '../components/ExploreContainer';
-import ApiCall from '../components/ApiCall';
 import './Page.scss';
+import {useKeycloak} from "@react-keycloak/web";
+import {KeycloakProfile} from "keycloak-js";
+
+const Page: React.FC = () => {
+
+    const {name} = useParams<{ name: string; }>();
+
+    const [keycloak, initialized] = useKeycloak();
+    const [profileLoaded, setProfileLoaded] = useState(0);
+    const [profile, setProfile] = useState<KeycloakProfile>();
 
 
-class Page extends React.Component<any, any> {
-    constructor(props: any) {
-        super(props);
-        this.state = {keycloak: null, authenticated: false, params: null};
-    }
+    useEffect(() => {
+        if (initialized && profileLoaded === 0) {
+            setProfileLoaded(1);
+            keycloak.loadUserProfile().then(result => {
+                setProfile(result);
+            })
+        }
+    });
 
-    componentDidMount() {
-        const keycloak: Keycloak.KeycloakInstance = Keycloak();
-        //TU SIE PSUJE edit: JUŻ TYLKO CZASAMI
-        //check-sso
-        //login-required
-        keycloak.init({onLoad: 'check-sso', checkLoginIframe: false}).then(authenticated => {
-            keycloak.authenticated = authenticated;
-            //nie wiem czy to potrzebne jest
-            // @ts-ignore
-            sessionStorage.setItem('authentication', keycloak.token);
-            // @ts-ignore
-            sessionStorage.setItem('refreshToken', keycloak.refreshToken);
-            const {match: {params}} = this.props;
-            this.setState({keycloak: keycloak, authenticated: authenticated, params: params})
-
-        }).catch(function () {
-            console.log('failed to initialize');
-        });
-    }
-
-    render() {
+    if (!initialized && profileLoaded === 0 && typeof profile === 'undefined') {
+        return (<div>bdbam</div>);
+    } else {
         return (
             <IonPage>
                 <IonHeader>
@@ -41,25 +34,21 @@ class Page extends React.Component<any, any> {
                         <IonButtons slot="start">
                             <IonMenuButton/>
                         </IonButtons>
-                        {/*<IonTitle>{params.name}</IonTitle>*/}
+                        <IonTitle>{name}</IonTitle>
                     </IonToolbar>
                 </IonHeader>
 
                 <IonContent>
                     <IonHeader collapse="condense">
                         <IonToolbar>
-                            {/*<IonTitle size="large">{params.name}</IonTitle>*/}
+                            <IonTitle size="large">{name} {profile && profile.username}</IonTitle>
                         </IonToolbar>
                     </IonHeader>
-                    <h2>{this.state.authenticated ? 'authenticated' : 'not authenticated'}</h2>
-                    <ExploreContainer name="testName"
-                                      authenticated={this.state.authenticated}
-                                      keycloak={this.state.keycloak}/>
-                    <ApiCall/>
+                    <ExploreContainer name={profile && profile.username} />
                 </IonContent>
             </IonPage>
-        )
-    };
+        );
+    }
 };
 
 export default Page;

@@ -1,7 +1,7 @@
 import Menu from './components/Menu';
 import Page from './pages/Page';
 import LoginPage from './pages/auth/LoginPage';
-import React from 'react';
+import React, {useEffect} from 'react';
 import {IonApp, IonRouterOutlet, IonSplitPane} from '@ionic/react';
 import {IonReactRouter} from '@ionic/react-router';
 import {Route} from 'react-router-dom';
@@ -26,20 +26,25 @@ import '@ionic/react/css/display.css';
 import './theme/variables.scss';
 import './theme/global.scss';
 
+import {KeycloakProvider} from "@react-keycloak/web";
+import keycloak from "./keycloak"
+
 const App: React.FC = () => {
     return (
-        <IonApp>
-            <IonReactRouter>
-                <IonSplitPane contentId="main">
-                    <Menu/>
-                    <IonRouterOutlet id="main">
-                        <Route path="/page/:name" component={Page}/>
-                        <Route path="/login" component={LoginPage}/>
-                        {/*<Redirect from="/" to="/login"/>*/}
-                    </IonRouterOutlet>
-                </IonSplitPane>
-            </IonReactRouter>
-        </IonApp>
+        <KeycloakProvider keycloak={keycloak} initConfig={{onLoad: 'login-required', checkLoginIframe: false}}>
+            <IonApp>
+                <IonReactRouter>
+                    <IonSplitPane contentId="main">
+                        <Menu/>
+                        <IonRouterOutlet id="main">
+                            <Route path="/page/:name" component={Page}/>
+                            <Route path="/" component={LoginPage}/>
+                            {/*<Redirect from="/" to="/page/Inbox"/>*/}
+                        </IonRouterOutlet>
+                    </IonSplitPane>
+                </IonReactRouter>
+            </IonApp>
+        </KeycloakProvider>
     );
 };
 
