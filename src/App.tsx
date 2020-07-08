@@ -29,7 +29,9 @@ import './theme/global.scss';
 import {KeycloakProvider} from "@react-keycloak/web";
 import keycloak from "./keycloak"
 
+
 const App: React.FC = () => {
+
     return (
         <KeycloakProvider keycloak={keycloak} initConfig={{onLoad: 'login-required', checkLoginIframe: false}}>
             <IonApp>

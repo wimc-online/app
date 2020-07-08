@@ -13,6 +13,7 @@ const Page: React.FC = () => {
     const [keycloak, initialized] = useKeycloak();
     const [profileLoaded, setProfileLoaded] = useState(0);
     const [profile, setProfile] = useState<KeycloakProfile>();
+    const [time, setTime] = useState<string>();
 
 
     useEffect(() => {
@@ -20,34 +21,38 @@ const Page: React.FC = () => {
             setProfileLoaded(1);
             keycloak.loadUserProfile().then(result => {
                 setProfile(result);
-            })
+            });
         }
+        const interval = setInterval(() => {
+            let date = new Date;
+            setTime(date.toLocaleTimeString());
+        }, 1000);
+        return () => clearInterval(interval)
     });
 
-    if (!initialized && profileLoaded === 0 && typeof profile === 'undefined') {
-        return (<div>bdbam</div>);
-    } else {
+    if (initialized && profileLoaded === 1 && typeof profile != "undefined") {
         return (
             <IonPage>
                 <IonHeader>
                     <IonToolbar>
                         <IonButtons slot="start">
-                            <IonMenuButton/>
+                            <IonMenuButton/> {name}
                         </IonButtons>
-                        <IonTitle>{name}</IonTitle>
                     </IonToolbar>
                 </IonHeader>
 
                 <IonContent>
                     <IonHeader collapse="condense">
                         <IonToolbar>
-                            <IonTitle size="large">{name} {profile && profile.username}</IonTitle>
+                            <IonTitle size="large" className="ion-text-center">{time}</IonTitle>
                         </IonToolbar>
                     </IonHeader>
-                    <ExploreContainer name={profile && profile.username} />
+                    <ExploreContainer name={profile.username}/>
                 </IonContent>
             </IonPage>
         );
+    } else {
+        return <span>Loading...</span>
     }
 };
 

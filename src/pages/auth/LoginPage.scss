@@ -1,8 +1,30 @@
 ion-grid {
-    display: flex;
-    height: 100%;
-    justify-content: center;
+  display: flex;
+  height: 100%;
+  justify-content: center;
 }
+
 ion-row {
-    width: 100%;
+  width: 100%;
+}
+
+ion-button {
+  --background: #FFFFFF;
+  --border-radius: 30px;
+  --color: gray;
+  text-transform: uppercase;
+  font-weight: bold;
+  font-size: 24px;
+
+  a {
+    text-decoration: none;
+  }
+}
+
+ion-item {
+  text-decoration: none;
+}
+
+.divider {
+    height: 50vh;
 }
