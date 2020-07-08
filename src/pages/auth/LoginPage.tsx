@@ -19,9 +19,13 @@ const LoginPage: React.FC = () => {
                 <IonGrid>
                     <IonRow>
                         <IonCol className="ion-align-self-center">
-                            <LoginForm/>
-                            <Link to="/page/Inbox">
-                                <IonButton expand="full">Go to panel</IonButton>
+                            {/*<LoginForm/>*/}
+                            <div className="loginForm ion-text-center">
+                                <img src="/assets/logos/logo-wimc-gray.png" alt=""/>
+                            </div>
+                            <div className="divider"></div>
+                            <Link to="/page/Dashboard">
+                                <IonButton expand="block" no-lines>Go to panel</IonButton>
                             </Link>
                         </IonCol>
                     </IonRow>

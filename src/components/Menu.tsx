@@ -19,10 +19,14 @@ import {
     mailOutline,
     mailSharp,
     paperPlaneOutline,
-    paperPlaneSharp
+    paperPlaneSharp,
+    cubeOutline,
+    folderOpenOutline,
+    logOutOutline
 } from 'ionicons/icons';
 import './Menu.scss';
 import {useKeycloak} from "@react-keycloak/web";
+import keycloak from "../keycloak";
 
 interface AppPage {
     url: string;
@@ -33,22 +37,25 @@ interface AppPage {
 
 const appPages: AppPage[] = [
     {
-        title: 'Inbox',
-        url: '/page/Inbox',
+        title: 'Dashboard',
+        url: '/page/Dashboard',
         iosIcon: mailOutline,
         mdIcon: mailSharp
+    }
+];
+
+const courierPages: AppPage[] = [
+    {
+        title: 'Orders',
+        url: '/page/Orders',
+        iosIcon: cubeOutline,
+        mdIcon: cubeOutline
     },
     {
-        title: 'Outbox',
-        url: '/page/Outbox',
-        iosIcon: paperPlaneOutline,
-        mdIcon: paperPlaneSharp
-    },
-    {
-        title: 'Login',
-        url: '/auth/LoginPage',
-        iosIcon: heartOutline,
-        mdIcon: heartSharp
+        title: 'History',
+        url: '/page/History',
+        iosIcon: folderOpenOutline,
+        mdIcon: folderOpenOutline
     }
 ];
 
@@ -68,11 +75,33 @@ const Menu: React.FC = () => {
         }
     });
 
+    const RenderMenuByRole = ({}) => {
+        if (keycloak.hasRealmRole('courier')) {
+            return (
+                <div>
+                    {courierPages.map((appPage, index) => {
+                        index = index + appPages.length;
+                        return (
+                            <IonMenuToggle key={index} autoHide={false}>
+                                <IonItem className={location.pathname === appPage.url ? 'selected' : ''}
+                                         routerLink={appPage.url} routerDirection="none" lines="none" detail={false}>
+                                    <IonIcon slot="start" ios={appPage.iosIcon} md={appPage.mdIcon}/>
+                                    <IonLabel>{appPage.title}</IonLabel>
+                                </IonItem>
+                            </IonMenuToggle>
+                        );
+                    })}
+                </div>
+            );
+        }
+        return (<div></div>);
+    };
+
     return (
         <IonMenu contentId="main" type="overlay">
             <IonContent>
                 <IonList id="inbox-list">
-                    <IonListHeader>{name}</IonListHeader>
+                    <IonListHeader>username: {name}</IonListHeader>
                     <IonNote>{email}</IonNote>
                     {appPages.map((appPage, index) => {
                         return (
@@ -85,6 +114,7 @@ const Menu: React.FC = () => {
                             </IonMenuToggle>
                         );
                     })}
+                    <RenderMenuByRole/>
                 </IonList>
 
                 <IonList id="account-list">
@@ -92,7 +122,7 @@ const Menu: React.FC = () => {
                     <IonItem lines="none" key={1} onClick={() => {
                         keycloak.logout()
                     }}>
-                        <IonIcon slot="start" icon={bookmarkOutline}/>
+                        <IonIcon slot="start" icon={logOutOutline}/>
                         <IonLabel>Logout</IonLabel>
                     </IonItem>
                 </IonList>

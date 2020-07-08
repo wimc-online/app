@@ -1,0 +1,8 @@
+{
+  "realm": "wimc localhost",
+  "auth-server-url": "https://auth.wimc.online/auth/",
+  "ssl-required": "external",
+  "resource": "wimclocalhost",
+  "public-client": true,
+  "confidential-port": 0
+}
