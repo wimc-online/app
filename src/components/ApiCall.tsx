@@ -1,7 +1,9 @@
 import React, {Component} from 'react';
+import {KeycloakInstance} from "keycloak-js";
+import keycloak from "../keycloak";
 
 interface ApiCallProps {
-    isLogged?: boolean;
+    keycloak: KeycloakInstance;
 }
 
 
@@ -19,7 +21,10 @@ class ApiCall extends Component<ApiCallProps, any> {
     addCourier() {
         const requestOptions = {
             method: 'POST',
-            headers: {'Content-Type': 'application/json'},
+            headers: {
+                'Content-Type': 'application/json',
+                'Authentication': 'Bearer ' + keycloak.token
+            },
             body: JSON.stringify({})
         };
         fetch('https://api.wimc.localhost/couriers', requestOptions)
@@ -31,7 +36,14 @@ class ApiCall extends Component<ApiCallProps, any> {
     }
 
     getCouriers() {
-        fetch('https://api.wimc.localhost/couriers', {method: 'GET'})
+        const requestOptions = {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authentication': 'Bearer ' + keycloak.token,
+            }
+        };
+        fetch('https://api.wimc.localhost/couriers', requestOptions)
             .then(results => {
                 return results.json();
             }).then(data => {

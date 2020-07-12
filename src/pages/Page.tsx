@@ -1,10 +1,22 @@
-import {IonButtons, IonContent, IonHeader, IonMenuButton, IonPage, IonTitle, IonToolbar} from '@ionic/react';
+import {
+    IonButtons,
+    IonContent,
+    IonHeader,
+    IonMenuButton,
+    IonPage,
+    IonTitle,
+    IonToolbar,
+    IonLoading
+} from '@ionic/react';
 import React, {useState, useEffect} from 'react';
 import {useParams} from 'react-router';
 import ExploreContainer from '../components/ExploreContainer';
 import './Page.scss';
 import {useKeycloak} from "@react-keycloak/web";
 import {KeycloakProfile} from "keycloak-js";
+import CourierComponents from '../components/CourierComponents';
+import Clock from '../components/Clock';
+import CoordinatorComponents from '../components/CoordinatorComponents';
 
 const Page: React.FC = () => {
 
@@ -13,8 +25,6 @@ const Page: React.FC = () => {
     const [keycloak, initialized] = useKeycloak();
     const [profileLoaded, setProfileLoaded] = useState(0);
     const [profile, setProfile] = useState<KeycloakProfile>();
-    const [time, setTime] = useState<string>();
-
 
     useEffect(() => {
         if (initialized && profileLoaded === 0) {
@@ -23,36 +33,42 @@ const Page: React.FC = () => {
                 setProfile(result);
             });
         }
-        const interval = setInterval(() => {
-            let date = new Date;
-            setTime(date.toLocaleTimeString());
-        }, 1000);
-        return () => clearInterval(interval)
     });
 
     if (initialized && profileLoaded === 1 && typeof profile != "undefined") {
         return (
             <IonPage>
-                <IonHeader>
+                <IonHeader collapse="condense">
                     <IonToolbar>
                         <IonButtons slot="start">
-                            <IonMenuButton/> {name}
+                            <IonMenuButton/>
                         </IonButtons>
+                        <IonTitle>
+                            {name}
+                        </IonTitle>
                     </IonToolbar>
                 </IonHeader>
 
                 <IonContent>
                     <IonHeader collapse="condense">
                         <IonToolbar>
-                            <IonTitle size="large" className="ion-text-center">{time}</IonTitle>
+                            <IonTitle size="large" className="ion-text-center"><Clock/></IonTitle>
                         </IonToolbar>
                     </IonHeader>
                     <ExploreContainer name={profile.username}/>
+                    {keycloak.hasRealmRole('courier') ? <CourierComponents/> : <CoordinatorComponents keycloak={keycloak}/>}
                 </IonContent>
             </IonPage>
         );
     } else {
-        return <span>Loading...</span>
+        return (
+            <IonLoading
+                cssClass='my-custom-class'
+                isOpen={true}
+                message={'Please wait...'}
+                duration={5000}
+            />
+        );
     }
 };
 
