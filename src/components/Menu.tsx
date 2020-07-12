@@ -22,7 +22,8 @@ import {
     paperPlaneSharp,
     cubeOutline,
     folderOpenOutline,
-    logOutOutline
+    logOutOutline,
+    carOutline
 } from 'ionicons/icons';
 import './Menu.scss';
 import {useKeycloak} from "@react-keycloak/web";
@@ -59,6 +60,21 @@ const courierPages: AppPage[] = [
     }
 ];
 
+const coordinatorPages: AppPage[] = [
+    {
+        title: 'Orders',
+        url: '/page/Orders',
+        iosIcon: cubeOutline,
+        mdIcon: cubeOutline
+    },
+    {
+        title: 'Couriers',
+        url: '/page/Couriers',
+        iosIcon: carOutline,
+        mdIcon: carOutline
+    }
+];
+
 
 const Menu: React.FC = () => {
     const location = useLocation();
@@ -80,6 +96,23 @@ const Menu: React.FC = () => {
             return (
                 <div>
                     {courierPages.map((appPage, index) => {
+                        index = index + appPages.length;
+                        return (
+                            <IonMenuToggle key={index} autoHide={false}>
+                                <IonItem className={location.pathname === appPage.url ? 'selected' : ''}
+                                         routerLink={appPage.url} routerDirection="none" lines="none" detail={false}>
+                                    <IonIcon slot="start" ios={appPage.iosIcon} md={appPage.mdIcon}/>
+                                    <IonLabel>{appPage.title}</IonLabel>
+                                </IonItem>
+                            </IonMenuToggle>
+                        );
+                    })}
+                </div>
+            );
+        } else if (keycloak.hasRealmRole('coordinator')) {
+            return (
+                <div>
+                    {coordinatorPages.map((appPage, index) => {
                         index = index + appPages.length;
                         return (
                             <IonMenuToggle key={index} autoHide={false}>
