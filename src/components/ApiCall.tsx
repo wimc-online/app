@@ -41,7 +41,6 @@ class ApiCall extends Component<ApiCallProps, any> {
             headers: {
                 'Content-Type': 'application/json',
                 'Authentication': 'Bearer ' + keycloak.token,
-                'Access-Control-Allow-Origin': '*'
             }
         };
         fetch('https://api.wimc.localhost/couriers', requestOptions)
