@@ -1,199 +1,17 @@
 import React, {useEffect, useState} from 'react';
-import {GoogleMap, LoadScript, Marker, Circle} from '@react-google-maps/api';
+// @ts-ignore
+import Leaflet from 'leaflet';
 import {IonLoading} from "@ionic/react";
-
-const mapStyle = [
-    {
-        "elementType": "geometry",
-        "stylers": [
-            {
-                "color": "#212121"
-            }
-        ]
-    },
-    {
-        "elementType": "labels.icon",
-        "stylers": [
-            {
-                "visibility": "off"
-            }
-        ]
-    },
-    {
-        "elementType": "labels.text.fill",
-        "stylers": [
-            {
-                "color": "#757575"
-            }
-        ]
-    },
-    {
-        "elementType": "labels.text.stroke",
-        "stylers": [
-            {
-                "color": "#212121"
-            }
-        ]
-    },
-    {
-        "featureType": "administrative",
-        "elementType": "geometry",
-        "stylers": [
-            {
-                "color": "#757575"
-            }
-        ]
-    },
-    {
-        "featureType": "administrative.country",
-        "elementType": "labels.text.fill",
-        "stylers": [
-            {
-                "color": "#9e9e9e"
-            }
-        ]
-    },
-    {
-        "featureType": "administrative.land_parcel",
-        "stylers": [
-            {
-                "visibility": "off"
-            }
-        ]
-    },
-    {
-        "featureType": "administrative.locality",
-        "elementType": "labels.text.fill",
-        "stylers": [
-            {
-                "color": "#bdbdbd"
-            }
-        ]
-    },
-    {
-        "featureType": "poi",
-        "elementType": "labels.text.fill",
-        "stylers": [
-            {
-                "color": "#757575"
-            }
-        ]
-    },
-    {
-        "featureType": "poi.park",
-        "elementType": "geometry",
-        "stylers": [
-            {
-                "color": "#181818"
-            }
-        ]
-    },
-    {
-        "featureType": "poi.park",
-        "elementType": "labels.text.fill",
-        "stylers": [
-            {
-                "color": "#616161"
-            }
-        ]
-    },
-    {
-        "featureType": "poi.park",
-        "elementType": "labels.text.stroke",
-        "stylers": [
-            {
-                "color": "#1b1b1b"
-            }
-        ]
-    },
-    {
-        "featureType": "road",
-        "elementType": "geometry.fill",
-        "stylers": [
-            {
-                "color": "#2c2c2c"
-            }
-        ]
-    },
-    {
-        "featureType": "road",
-        "elementType": "labels.text.fill",
-        "stylers": [
-            {
-                "color": "#8a8a8a"
-            }
-        ]
-    },
-    {
-        "featureType": "road.arterial",
-        "elementType": "geometry",
-        "stylers": [
-            {
-                "color": "#373737"
-            }
-        ]
-    },
-    {
-        "featureType": "road.highway",
-        "elementType": "geometry",
-        "stylers": [
-            {
-                "color": "#3c3c3c"
-            }
-        ]
-    },
-    {
-        "featureType": "road.highway.controlled_access",
-        "elementType": "geometry",
-        "stylers": [
-            {
-                "color": "#4e4e4e"
-            }
-        ]
-    },
-    {
-        "featureType": "road.local",
-        "elementType": "labels.text.fill",
-        "stylers": [
-            {
-                "color": "#616161"
-            }
-        ]
-    },
-    {
-        "featureType": "transit",
-        "elementType": "labels.text.fill",
-        "stylers": [
-            {
-                "color": "#757575"
-            }
-        ]
-    },
-    {
-        "featureType": "water",
-        "elementType": "geometry",
-        "stylers": [
-            {
-                "color": "#000000"
-            }
-        ]
-    },
-    {
-        "featureType": "water",
-        "elementType": "labels.text.fill",
-        "stylers": [
-            {
-                "color": "#3d3d3d"
-            }
-        ]
-    }
-]
+// @ts-ignore
+import {Map, TileLayer, Marker, Popup, Circle} from 'react-leaflet';
+import './Geolocation.scss';
+import icon from 'leaflet/dist/images/marker-icon.png';
+import iconShadow from 'leaflet/dist/images/marker-shadow.png';
 
 const Geolocation: React.FC = () => {
     const [lat, setLat] = useState<number>(0);
     const [lng, setlng] = useState<number>(0);
     const [accuracy, setAccuracy] = useState<number>(0);
-    const [map, setMap] = React.useState(null);
 
     const containerStyle = {
         width: '100%',
@@ -206,15 +24,12 @@ const Geolocation: React.FC = () => {
         lng: -38.523
     };
 
-    // const onLoad = React.useCallback(function callback(map) {
-    //     const bounds = new window.google.maps.LatLngBounds();
-    //     map.fitBounds(bounds);
-    //     setMap(map)
-    // }, []);
-
-    const onUnmount = React.useCallback(function callback(map) {
-        setMap(null)
-    }, []);
+    let DefaultIcon = Leaflet.icon({
+        iconUrl: icon,
+        shadowUrl: iconShadow,
+        iconSize: [24,36],
+        iconAnchor: [12,36]
+    });
 
     useEffect(() => {
         if ("geolocation" in navigator) {
@@ -236,40 +51,15 @@ const Geolocation: React.FC = () => {
     if (lat != 0 && lng != 0) {
         return (
             <div>
-                Your location is: {lat} {lng}
-                <LoadScript
-                    googleMapsApiKey="AIzaSyAMU9h-nOctkpZGvz5G2a3vwtc0vTD7IkE"
-                >
-                    <GoogleMap
-                        mapContainerStyle={containerStyle}
-                        center={{
-                            lat: lat,
-                            lng: lng
-                        }}
-                        zoom={13}
-                        onUnmount={onUnmount}
-                        options={{styles: mapStyle}}
-                    >
-                        <Marker
-                            title={'Your current location'}
-                            label={'You'}
-                            position={{lat: lat, lng: lng}}/>
-
-                        <Circle
-                            radius={accuracy}
-                            center={{lat: lat, lng: lng}}
-                            options={{
-                                strokeColor: "#595959",
-                                strokeOpacity: 0.8,
-                                strokeWeight: 2,
-                                fillColor: "#595959",
-                                fillOpacity: 0.35
-                            }}
-                        />
-                        { /* Child components, such as markers, info windows, etc. */}
-                        <></>
-                    </GoogleMap>
-                </LoadScript>
+                {/*Your location is: {lat} {lng}*/}
+                <Map center={[lat, lng]} zoom={13}>
+                    <TileLayer
+                        attribution='&amp;copy <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+                        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                    />
+                    <Marker position={{lat, lng}} icon={DefaultIcon}/>
+                    <Circle center={{lat, lng}} radius={accuracy} options={{color:'#595959', fillColor: '#595959', fillOpacity: '0.35'}}/>
+                </Map>
             </div>
         )
     } else {

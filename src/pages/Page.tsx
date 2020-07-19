@@ -38,23 +38,18 @@ const Page: React.FC = () => {
     if (initialized && profileLoaded === 1 && typeof profile != "undefined") {
         return (
             <IonPage>
-                <IonHeader collapse="condense">
+                <IonHeader>
                     <IonToolbar>
                         <IonButtons slot="start">
                             <IonMenuButton/>
                         </IonButtons>
                         <IonTitle>
-                            {name}
+                            {name} <Clock/>
                         </IonTitle>
                     </IonToolbar>
                 </IonHeader>
 
                 <IonContent>
-                    <IonHeader collapse="condense">
-                        <IonToolbar>
-                            <IonTitle size="large" className="ion-text-center"><Clock/></IonTitle>
-                        </IonToolbar>
-                    </IonHeader>
                     <ExploreContainer name={profile.username}/>
                     {keycloak.hasRealmRole('courier') ? <CourierComponents/> : <CoordinatorComponents keycloak={keycloak}/>}
                 </IonContent>
