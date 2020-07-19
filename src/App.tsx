@@ -28,6 +28,7 @@ import './theme/global.scss';
 
 import {KeycloakProvider} from "@react-keycloak/web";
 import keycloak from "./keycloak"
+import 'leaflet/dist/leaflet.css';
 
 
 const App: React.FC = () => {

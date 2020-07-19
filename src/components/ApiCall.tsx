@@ -43,7 +43,7 @@ class ApiCall extends Component<ApiCallProps, any> {
                 'Authentication': 'Bearer ' + keycloak.token,
             }
         };
-        fetch('https://api.wimc.localhost/couriers', requestOptions)
+        fetch('https://api.wimc.online/couriers', requestOptions)
             .then(results => {
                 return results.json();
             }).then(data => {
