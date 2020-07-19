@@ -12,7 +12,8 @@ class ApiCall extends Component<ApiCallProps, any> {
         super(props);
         this.state = {
             existingCouriersCount: 0,
-            couriers: []
+            couriers: [],
+            apiEndpoint: (process.env.NODE_ENV === "development" ? "http://api.wimc.localhost" : "https://api.wimc.online")
         };
         this.getCouriers = this.getCouriers.bind(this);
         this.addCourier = this.addCourier.bind(this);
@@ -27,7 +28,7 @@ class ApiCall extends Component<ApiCallProps, any> {
             },
             body: JSON.stringify({})
         };
-        fetch('https://api.wimc.localhost/couriers', requestOptions)
+        fetch(this.state.apiEndpoint + '/couriers', requestOptions)
             .then(results => {
                 return results.json();
             }).then((data) => {
@@ -43,7 +44,7 @@ class ApiCall extends Component<ApiCallProps, any> {
                 'Authentication': 'Bearer ' + keycloak.token,
             }
         };
-        fetch('https://api.wimc.online/couriers', requestOptions)
+        fetch(this.state.apiEndpoint + '/couriers', requestOptions)
             .then(results => {
                 return results.json();
             }).then(data => {
@@ -59,9 +60,9 @@ class ApiCall extends Component<ApiCallProps, any> {
         return (
             <div>
                 <ul>
-                {this.state.couriers.map((courier:any, i:number) => {
-                    return (<li key={i}>{courier.id}</li>)
-                })}
+                    {this.state.couriers.map((courier:any, i:number) => {
+                        return (<li key={i}>{courier.id}</li>)
+                    })}
                 </ul>
                 <button type="button" onClick={this.addCourier}>
                     Add Courier
