@@ -153,7 +153,7 @@ const Menu: React.FC = () => {
                 <IonList id="account-list">
                     <IonListHeader>Account</IonListHeader>
                     <IonItem lines="none" key={1} onClick={() => {
-                        keycloak.logout()
+                        keycloak.logout({redirectUri: '/'})
                     }}>
                         <IonIcon slot="start" icon={logOutOutline}/>
                         <IonLabel>Logout</IonLabel>
