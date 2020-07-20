@@ -129,7 +129,6 @@ const Menu: React.FC = () => {
         }
         return (<div></div>);
     };
-
     return (
         <IonMenu contentId="main" type="overlay">
             <IonContent>
@@ -153,7 +152,7 @@ const Menu: React.FC = () => {
                 <IonList id="account-list">
                     <IonListHeader>Account</IonListHeader>
                     <IonItem lines="none" key={1} onClick={() => {
-                        keycloak.logout({redirectUri: '/'})
+                        keycloak.logout({redirectUri: window.location.origin})
                     }}>
                         <IonIcon slot="start" icon={logOutOutline}/>
                         <IonLabel>Logout</IonLabel>
