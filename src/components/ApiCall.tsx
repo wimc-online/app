@@ -13,7 +13,7 @@ class ApiCall extends Component<ApiCallProps, any> {
         this.state = {
             existingCouriersCount: 0,
             couriers: [],
-            apiEndpoint: (process.env.NODE_ENV === "development" ? "http://api.wimc.localhost" : "https://api.wimc.online")
+            apiEndpoint: (process.env.NODE_ENV === "development" ? "https://api.wimc.localhost" : "https://api.wimc.online")
         };
         this.getCouriers = this.getCouriers.bind(this);
         this.addCourier = this.addCourier.bind(this);
@@ -24,7 +24,7 @@ class ApiCall extends Component<ApiCallProps, any> {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authentication': 'Bearer ' + keycloak.token
+                'Authorization': 'Bearer ' + keycloak.token
             },
             body: JSON.stringify({})
         };
@@ -40,8 +40,8 @@ class ApiCall extends Component<ApiCallProps, any> {
         const requestOptions = {
             method: 'GET',
             headers: {
-                'Content-Type': 'application/json',
-                'Authentication': 'Bearer ' + keycloak.token,
+                'Content-Type': 'application/ld+json',
+                'Authorization': 'Bearer ' + keycloak.token,
             }
         };
         fetch(this.state.apiEndpoint + '/couriers', requestOptions)
