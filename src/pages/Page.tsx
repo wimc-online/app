@@ -51,7 +51,9 @@ const Page: React.FC = () => {
 
                 <IonContent>
                     <ExploreContainer name={profile.username}/>
-                    {keycloak.hasRealmRole('courier') ? <CourierComponents/> : <CoordinatorComponents keycloak={keycloak}/>}
+                    {keycloak.hasRealmRole('courier')
+                        ? <CourierComponents/>
+                        : <CoordinatorComponents keycloak={keycloak} page={name}/>}
                 </IonContent>
             </IonPage>
         );

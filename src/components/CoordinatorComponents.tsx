@@ -1,16 +1,40 @@
 import React from 'react';
 import ApiCall from "./ApiCall";
 import {KeycloakInstance} from "keycloak-js";
+import keycloak from "../keycloak";
+import AddTask from "./orders/AddTask";
+import GetTasks from "./orders/GetTasks";
 
 
 interface ContainerProps {
-    keycloak: KeycloakInstance;
+    keycloak: KeycloakInstance,
+    page: string
 }
 
-const CoordinatorComponents: React.FC<ContainerProps> = ({keycloak}) => {
+function renderSwitch({page}: { page: string }) {
+    switch (page) {
+        case 'Dashboard':
+            return (
+                <div>
+                    <ApiCall keycloak={keycloak} />
+                </div>
+            );
+        case 'Orders':
+            return (
+                <div>
+                    <GetTasks keycloak={keycloak}/>
+                    <AddTask keycloak={keycloak} />
+                </div>
+            );
+        default:
+            return 'default';
+    }
+}
+
+const CoordinatorComponents: React.FC<ContainerProps> = ({keycloak, page}) => {
     return (
         <div>
-            <ApiCall keycloak={keycloak}/>
+            {renderSwitch({page: page})}
         </div>
     )
 };
