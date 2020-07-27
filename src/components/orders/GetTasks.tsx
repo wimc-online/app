@@ -28,14 +28,10 @@ const AddTask: React.FC<ContainerProps> = ({keycloak}) => {
     };
 
     useEffect(() => {
-        if ("geolocation" in navigator) {
-            const interval = setInterval(() => {
-                getTasks();
-            }, 5000);
-            return () => clearInterval(interval)
-        } else {
-            console.log("Not Available");
-        }
+        const interval = setInterval(() => {
+            getTasks();
+        }, 10000);
+        return () => clearInterval(interval)
     }, []);
 
     return (
