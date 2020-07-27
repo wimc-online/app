@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {MutableRefObject, useEffect, useRef, useState} from 'react';
 import {KeycloakInstance} from "keycloak-js";
 import "./AddTask.scss";
 import {IonLoading} from "@ionic/react";
@@ -14,6 +14,7 @@ const AddTask: React.FC<ContainerProps> = ({keycloak}) => {
     const [tasks, setTasks] = useState([]);
     const [couriers, setCouriers] = useState([]);
     const apiEndpoint = (process.env.NODE_ENV === "development" ? "https://api.wimc.localhost" : "https://api.wimc.online");
+    const taskSelectRef = useRef() as MutableRefObject<HTMLLabelElement>;
 
     const addTask = () => {
         const requestOptions = {
@@ -87,13 +88,24 @@ const AddTask: React.FC<ContainerProps> = ({keycloak}) => {
         evt.preventDefault();
     };
 
+    // @ts-ignore
+    const onCourierStateChange = (e) => {
+        if (e.target.value !== '') {
+            setCourier(e.target.value);
+            taskSelectRef.current.classList.remove("d-none");
+        } else {
+            taskSelectRef.current.classList.add("d-none");
+        }
+
+    };
+
     if (couriers.length > 0) {
         return (
             <div>
                 <form onSubmit={taskSubmit}>
                     <label>
                         Courier:<br/>
-                        <select value={courier} id="" onChange={e => setCourier(e.target.value)}>
+                        <select value={courier} id="" onChange={onCourierStateChange}>
                             <option value="">Select courier</option>
                             {couriers.map((courier: any, i: number) => {
                                 return (
@@ -102,10 +114,21 @@ const AddTask: React.FC<ContainerProps> = ({keycloak}) => {
                             })}
                         </select>
                     </label> <br/>
+                    <label id="taskId" ref={taskSelectRef} className='d-none'>
+                        Task:<br/>
+                        <select value={task} id="" onChange={e => setTask(e.target.value)}>
+                            <option value="">Select task</option>
+                            {tasks.map((task: any, i: number) => {
+                                return (
+                                    <option key={i} value={task.id}>{task.id}</option>
+                                )
+                            })}
+                        </select>
+                    </label> <br/>
                     <input type="submit" value="Submit"/>
                 </form>
 
-                <form onSubmit={subtaskSubmit}>
+                <form onSubmit={subtaskSubmit} className={task.length === 0 ? 'd-none' : ''}>
                     <label>
                         Task name:
                         <input type="text" value={task} onChange={e => setTask(e.target.value)}/>

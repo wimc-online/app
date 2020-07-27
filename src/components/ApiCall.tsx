@@ -1,25 +1,18 @@
-import React, {Component} from 'react';
+import React, {Component, useEffect, useState} from 'react';
 import {KeycloakInstance} from "keycloak-js";
 import keycloak from "../keycloak";
+import "../helpers/CourierHelper";
+import {getCouriers} from "../helpers/CourierHelper";
 
-interface ApiCallProps {
+interface ContainerProps {
     keycloak: KeycloakInstance;
 }
 
+const ApiCall: React.FC<ContainerProps> = ({keycloak}) => {
+    const [couriers, setCouriers] = useState([]);
+    const apiEndpoint = (process.env.NODE_ENV === "development" ? "https://api.wimc.localhost" : "https://api.wimc.online");
 
-class ApiCall extends Component<ApiCallProps, any> {
-    constructor(props: any) {
-        super(props);
-        this.state = {
-            existingCouriersCount: 0,
-            couriers: [],
-            apiEndpoint: (process.env.NODE_ENV === "development" ? "https://api.wimc.localhost" : "https://api.wimc.online")
-        };
-        this.getCouriers = this.getCouriers.bind(this);
-        this.addCourier = this.addCourier.bind(this);
-    };
-
-    addCourier() {
+    const addCourier = () => {
         const requestOptions = {
             method: 'POST',
             headers: {
@@ -28,48 +21,37 @@ class ApiCall extends Component<ApiCallProps, any> {
             },
             body: JSON.stringify({})
         };
-        fetch(this.state.apiEndpoint + '/couriers', requestOptions)
+        fetch(apiEndpoint + '/couriers', requestOptions)
             .then(results => {
                 return results.json();
             }).then((data) => {
-            this.getCouriers();
+            getCouriers(keycloak, apiEndpoint).then(response => setCouriers(response));
         });
-    }
-
-    getCouriers() {
-        const requestOptions = {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/ld+json',
-                'Authorization': 'Bearer ' + keycloak.token,
-            }
-        };
-        fetch(this.state.apiEndpoint + '/couriers', requestOptions)
-            .then(results => {
-                return results.json();
-            }).then(data => {
-            this.setState({existingCouriersCount: data['hydra:totalItems'], couriers: data['hydra:member']});
-        })
-    }
-
-    componentDidMount() {
-        this.getCouriers();
     };
 
-    render() {
+    useEffect(() => {
+        const interval = setInterval(() => {
+            getCouriers(keycloak, apiEndpoint).then(response => setCouriers(response));
+        }, 10000);
+        return () => clearInterval(interval)
+    }, []);
+
+    if (couriers.length > 0) {
         return (
             <div>
                 <ul>
-                    {this.state.couriers.map((courier:any, i:number) => {
+                    {couriers.map((courier: any, i: number) => {
                         return (<li key={i}>{courier.id}</li>)
                     })}
                 </ul>
-                <button type="button" onClick={this.addCourier}>
+                <button type="button" onClick={addCourier}>
                     Add Courier
                 </button>
             </div>
         )
-    };
-}
+    } else {
+        return (<div></div>)
+    }
+};
 
 export default ApiCall;
