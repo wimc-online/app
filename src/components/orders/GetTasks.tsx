@@ -10,14 +10,17 @@ interface ContainerProps {
 const AddTask: React.FC<ContainerProps> = ({keycloak}) => {
     const [tasks, setTasks] = useState([]);
     const apiEndpoint = (process.env.NODE_ENV === "development" ? "https://api.wimc.localhost" : "https://api.wimc.online");
+    const abortController = new AbortController();
 
-    const getTasks = () => {
+    //@ts-ignore
+    const getTasks = (signal) => {
         const requestOptions = {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/ld+json',
                 'Authorization': 'Bearer ' + keycloak.token,
-            }
+            },
+            signal: signal
         };
         fetch(apiEndpoint + '/tasks', requestOptions)
             .then(results => {
@@ -28,10 +31,15 @@ const AddTask: React.FC<ContainerProps> = ({keycloak}) => {
     };
 
     useEffect(() => {
+        getTasks(abortController.signal);
         const interval = setInterval(() => {
-            getTasks();
+            getTasks(abortController.signal);
         }, 10000);
-        return () => clearInterval(interval)
+        return () => {
+            clearInterval(interval);
+            console.log('abort');
+            abortController.abort();
+        }
     }, []);
 
     return (
