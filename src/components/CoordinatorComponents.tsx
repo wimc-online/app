@@ -16,14 +16,20 @@ function renderSwitch({page}: { page: string }) {
         case 'Dashboard':
             return (
                 <div>
-                    <ApiCall keycloak={keycloak} />
+                    Dashboard
                 </div>
             );
         case 'Orders':
             return (
                 <div>
                     <GetTasks keycloak={keycloak}/>
-                    <AddTask keycloak={keycloak} />
+                    <AddTask keycloak={keycloak}/>
+                </div>
+            );
+        case 'Couriers':
+            return (
+                <div>
+                    <ApiCall keycloak={keycloak}/>
                 </div>
             );
         default:

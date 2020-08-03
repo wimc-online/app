@@ -32,7 +32,6 @@ import 'leaflet/dist/leaflet.css';
 
 
 const App: React.FC = () => {
-
     return (
         <KeycloakProvider keycloak={keycloak} initConfig={{onLoad: 'login-required', checkLoginIframe: false}}>
             <IonApp>

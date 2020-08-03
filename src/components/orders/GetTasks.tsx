@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {KeycloakInstance} from "keycloak-js";
 import keycloak from "../../keycloak";
+import {getTasks} from "../../helpers/TaskHelper";
 
 
 interface ContainerProps {
@@ -12,32 +13,13 @@ const AddTask: React.FC<ContainerProps> = ({keycloak}) => {
     const apiEndpoint = (process.env.NODE_ENV === "development" ? "https://api.wimc.localhost" : "https://api.wimc.online");
     const abortController = new AbortController();
 
-    //@ts-ignore
-    const getTasks = (signal) => {
-        const requestOptions = {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/ld+json',
-                'Authorization': 'Bearer ' + keycloak.token,
-            },
-            signal: signal
-        };
-        fetch(apiEndpoint + '/tasks', requestOptions)
-            .then(results => {
-                return results.json();
-            }).then(data => {
-            setTasks(data['hydra:member'])
-        })
-    };
-
     useEffect(() => {
-        getTasks(abortController.signal);
+        getTasks(keycloak, apiEndpoint, abortController.signal).then(response => setTasks(response));
         const interval = setInterval(() => {
-            getTasks(abortController.signal);
+            getTasks(keycloak, apiEndpoint, abortController.signal).then(response => setTasks(response));
         }, 10000);
         return () => {
             clearInterval(interval);
-            console.log('abort');
             abortController.abort();
         }
     }, []);
@@ -45,7 +27,6 @@ const AddTask: React.FC<ContainerProps> = ({keycloak}) => {
     return (
         <div>
             {tasks.map((task: any, i: number) => {
-                console.log(task);
                 return (
                     <ul key={i}>
                         <li>Task id: {task.id}</li>
