@@ -2,7 +2,7 @@ import React, {Component, useEffect, useState} from 'react';
 import {KeycloakInstance} from "keycloak-js";
 import keycloak from "../keycloak";
 import "../helpers/CourierHelper";
-import {getCouriers} from "../helpers/CourierHelper";
+import {getCouriers, addCourier} from "../helpers/CourierHelper";
 
 interface ContainerProps {
     keycloak: KeycloakInstance;
@@ -11,47 +11,41 @@ interface ContainerProps {
 const ApiCall: React.FC<ContainerProps> = ({keycloak}) => {
     const [couriers, setCouriers] = useState([]);
     const apiEndpoint = (process.env.NODE_ENV === "development" ? "https://api.wimc.localhost" : "https://api.wimc.online");
+    const abortController = new AbortController();
 
-    const addCourier = () => {
-        const requestOptions = {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + keycloak.token
-            },
-            body: JSON.stringify({})
-        };
-        fetch(apiEndpoint + '/couriers', requestOptions)
-            .then(results => {
-                return results.json();
-            }).then((data) => {
-            getCouriers(keycloak, apiEndpoint).then(response => setCouriers(response));
+    const handleAddCourierButton = () => {
+        addCourier(keycloak, apiEndpoint, abortController.signal).then(response => {
+            getCouriers(keycloak, apiEndpoint, abortController.signal).then(response => setCouriers(response));
         });
     };
 
     useEffect(() => {
+        getCouriers(keycloak, apiEndpoint, abortController.signal).then(response => setCouriers(response));
         const interval = setInterval(() => {
-            getCouriers(keycloak, apiEndpoint).then(response => setCouriers(response));
+            getCouriers(keycloak, apiEndpoint, abortController.signal).then(response => setCouriers(response));
         }, 10000);
-        return () => clearInterval(interval)
+        return () => {
+            abortController.abort();
+            clearInterval(interval);
+        }
     }, []);
 
-    if (couriers.length > 0) {
-        return (
-            <div>
+    return (
+        <div>
+            {couriers.length > 0 ?
                 <ul>
                     {couriers.map((courier: any, i: number) => {
+                        console.log(courier);
                         return (<li key={i}>{courier.id}</li>)
                     })}
                 </ul>
-                <button type="button" onClick={addCourier}>
-                    Add Courier
-                </button>
-            </div>
-        )
-    } else {
-        return (<div></div>)
-    }
+                : <></>
+            }
+            <button type="button" onClick={handleAddCourierButton}>
+                Add Courier
+            </button>
+        </div>
+    )
 };
 
 export default ApiCall;
