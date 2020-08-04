@@ -1,77 +1,32 @@
 import React, {MutableRefObject, useEffect, useRef, useState} from 'react';
 import {KeycloakInstance} from "keycloak-js";
 import "./AddTask.scss";
-import {IonLoading} from "@ionic/react";
+import {IonButton, IonLoading} from "@ionic/react";
+import AddSubTask from './AddSubTask';
+import {addTask, getTasks} from "../../helpers/TaskHelper";
+import { getCouriers } from '../../helpers/CourierHelper';
 
 
 interface ContainerProps {
     keycloak: KeycloakInstance,
+    tasks?: never[],
+    couriers: never[]
 }
 
-const AddTask: React.FC<ContainerProps> = ({keycloak}) => {
+const AddTask: React.FC<ContainerProps> = ({keycloak, tasks, couriers}) => {
     const [courier, setCourier] = useState("");
-    const [task, setTask] = useState("");
-    const [tasks, setTasks] = useState([]);
-    const [couriers, setCouriers] = useState([]);
     const apiEndpoint = (process.env.NODE_ENV === "development" ? "https://api.wimc.localhost" : "https://api.wimc.online");
-    const taskSelectRef = useRef() as MutableRefObject<HTMLLabelElement>;
+    const abortController = new AbortController();
 
-    const addTask = () => {
-        const requestOptions = {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/ld+json',
-                'Authorization': 'Bearer ' + keycloak.token,
-            },
-            body: JSON.stringify({
-                courier: '/couriers/' + courier,
-                isProcessing: false
-            })
-        };
-        fetch(apiEndpoint + '/tasks', requestOptions)
-            .then(results => {
-                return results.json();
-            }).then(data => {
-            console.log(data);
-        })
-    };
-
-    const getCouriers = () => {
-        const requestOptions = {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/ld+json',
-                'Authorization': 'Bearer ' + keycloak.token,
-            }
-        };
-        fetch(apiEndpoint + '/couriers', requestOptions)
-            .then(results => {
-                return results.json();
-            }).then(data => {
-            setCouriers(data['hydra:member']);
-            console.log(data['hydra:member']);
-        })
-    };
-
-    const getTasks = () => {
-        const requestOptions = {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/ld+json',
-                'Authorization': 'Bearer ' + keycloak.token,
-            }
-        };
-        fetch(apiEndpoint + '/tasks', requestOptions)
-            .then(results => {
-                return results.json();
-            }).then(data => {
-            setTasks(data['hydra:member'])
-        })
+    const addTaskHandler = () => {
+        addTask(keycloak, apiEndpoint, abortController, {courier: courier}).then(response => console.log(response));
     };
 
     useEffect(() => {
-        getCouriers();
-        getTasks();
+
+        return () => {
+            abortController.abort();
+        }
     }, []);
 
     // @ts-ignore
@@ -80,23 +35,15 @@ const AddTask: React.FC<ContainerProps> = ({keycloak}) => {
         if (courier.length === 0) {
 
         } else {
-            addTask();
+            addTaskHandler();
         }
-    };
-    // @ts-ignore
-    const subtaskSubmit = (evt) => {
-        evt.preventDefault();
     };
 
     // @ts-ignore
     const onCourierStateChange = (e) => {
         if (e.target.value !== '') {
             setCourier(e.target.value);
-            taskSelectRef.current.classList.remove("d-none");
-        } else {
-            taskSelectRef.current.classList.add("d-none");
         }
-
     };
 
     if (couriers.length > 0) {
@@ -114,39 +61,8 @@ const AddTask: React.FC<ContainerProps> = ({keycloak}) => {
                             })}
                         </select>
                     </label> <br/>
-                    <label id="taskId" ref={taskSelectRef} className='d-none'>
-                        Task:<br/>
-                        <select value={task} id="" onChange={e => setTask(e.target.value)}>
-                            <option value="">Select task</option>
-                            {tasks.map((task: any, i: number) => {
-                                return (
-                                    <option key={i} value={task.id}>{task.id}</option>
-                                )
-                            })}
-                        </select>
-                    </label> <br/>
-                    <input type="submit" value="Submit"/>
+                    <IonButton color="medium" type="submit">Add Task</IonButton>
                 </form>
-
-                <form onSubmit={subtaskSubmit} className={task.length === 0 ? 'd-none' : ''}>
-                    <label>
-                        Task name:
-                        <input type="text" value={task} onChange={e => setTask(e.target.value)}/>
-                    </label> <br/>
-                    <label>
-                        Task:<br/>
-                        <select value={task} id="" onChange={e => setTask(e.target.value)}>
-                            <option value="">Select task</option>
-                            {tasks.map((task: any, i: number) => {
-                                return (
-                                    <option key={i} value={task.id}>{task.id}</option>
-                                )
-                            })}
-                        </select>
-                    </label> <br/>
-                    <input type="submit" value="Submit"/>
-                </form>
-
             </div>
         )
     } else {

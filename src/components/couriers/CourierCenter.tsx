@@ -1,14 +1,23 @@
 import React, {Component, useEffect, useState} from 'react';
 import {KeycloakInstance} from "keycloak-js";
-import keycloak from "../keycloak";
-import "../helpers/CourierHelper";
-import {getCouriers, addCourier} from "../helpers/CourierHelper";
+import keycloak from "../../keycloak";
+import "../../helpers/CourierHelper";
+import {getCouriers, addCourier} from "../../helpers/CourierHelper";
+import {
+    IonButton,
+    IonCard,
+    IonCardHeader,
+    IonCardSubtitle,
+    IonCardTitle,
+    IonCardContent
+} from "@ionic/react";
+import PrintCouriers from "./PrintCouriers";
 
 interface ContainerProps {
     keycloak: KeycloakInstance;
 }
 
-const ApiCall: React.FC<ContainerProps> = ({keycloak}) => {
+const CourierCenter: React.FC<ContainerProps> = ({keycloak}) => {
     const [couriers, setCouriers] = useState([]);
     const apiEndpoint = (process.env.NODE_ENV === "development" ? "https://api.wimc.localhost" : "https://api.wimc.online");
     const abortController = new AbortController();
@@ -33,19 +42,12 @@ const ApiCall: React.FC<ContainerProps> = ({keycloak}) => {
     return (
         <div>
             {couriers.length > 0 ?
-                <ul>
-                    {couriers.map((courier: any, i: number) => {
-                        console.log(courier);
-                        return (<li key={i}>{courier.id}</li>)
-                    })}
-                </ul>
+                <PrintCouriers couriers={couriers} />
                 : <></>
             }
-            <button type="button" onClick={handleAddCourierButton}>
-                Add Courier
-            </button>
+            <IonButton color="medium" type="button" onClick={handleAddCourierButton}>Add Courier</IonButton>
         </div>
     )
 };
 
-export default ApiCall;
+export default CourierCenter;

@@ -31,6 +31,8 @@ const Page: React.FC = () => {
             setProfileLoaded(1);
             keycloak.loadUserProfile().then(result => {
                 setProfile(result);
+                // @ts-ignore
+                // console.log(result["attributes"]["courierId"]);
             });
         }
     });

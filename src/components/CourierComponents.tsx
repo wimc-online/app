@@ -1,8 +1,7 @@
 import React from 'react';
 import Geolocation from "./Geolocation";
-import ApiCall from "./ApiCall";
+import CourierCenter from "./couriers/CourierCenter";
 import keycloak from "../keycloak";
-import GetTasks from "./orders/GetTasks";
 import AddTask from "./orders/AddTask";
 import {KeycloakInstance} from "keycloak-js";
 
@@ -21,7 +20,7 @@ function renderSwitch({page}: { page: string }) {
         case 'Orders':
             return (
                 <div>
-                    <GetTasks keycloak={keycloak}/>
+                    {/*<GetTasks keycloak={keycloak}/>*/}
                 </div>
             );
         default:
