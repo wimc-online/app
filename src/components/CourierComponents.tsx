@@ -1,5 +1,6 @@
 import React from 'react';
 import Geolocation from "./Geolocation";
+import TaskApprovalPopup from "./orders/TaskApprovalPopup";
 import CourierCenter from "./couriers/CourierCenter";
 import keycloak from "../keycloak";
 import AddTask from "./orders/AddTask";
@@ -14,6 +15,7 @@ function renderSwitch({page}: { page: string }) {
         case 'Dashboard':
             return (
                 <div>
+                    <TaskApprovalPopup keycloak={keycloak}/>
                     <Geolocation />
                 </div>
             );

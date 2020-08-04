@@ -1,0 +1,33 @@
+@import "../../theme/variables";
+
+.task-approval-popup {
+
+  .ion-page {
+    background: $grey;
+    justify-content: center;
+
+    h2 {
+      text-align: center;
+      text-transform: uppercase;
+      margin-bottom: 50px;
+    }
+
+    ion-card {
+      max-width: 90%;
+      align-self: center;
+    }
+
+    .button-wrapper {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-around;
+      margin-top: 50px;
+
+      ion-progress-bar {
+        flex-basis: 100%;
+        margin-bottom: 50px;
+      }
+
+    }
+  }
+}
