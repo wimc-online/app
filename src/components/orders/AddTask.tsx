@@ -19,7 +19,7 @@ const AddTask: React.FC<ContainerProps> = ({keycloak, tasks, couriers}) => {
     const abortController = new AbortController();
 
     const addTaskHandler = () => {
-        addTask(keycloak, apiEndpoint, abortController, {courier: courier}).then(response => console.log(response));
+        addTask(keycloak, apiEndpoint, abortController.signal, {courier: courier}).then(response => console.log(response));
     };
 
     useEffect(() => {
