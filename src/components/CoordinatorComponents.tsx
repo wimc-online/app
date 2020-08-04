@@ -1,9 +1,8 @@
 import React from 'react';
-import ApiCall from "./ApiCall";
+import CourierCenter from "./couriers/CourierCenter";
 import {KeycloakInstance} from "keycloak-js";
 import keycloak from "../keycloak";
-import AddTask from "./orders/AddTask";
-import GetTasks from "./orders/GetTasks";
+import TaskCenter from "./orders/TaskCenter";
 
 
 interface ContainerProps {
@@ -22,14 +21,13 @@ function renderSwitch({page}: { page: string }) {
         case 'Orders':
             return (
                 <div>
-                    <GetTasks keycloak={keycloak}/>
-                    <AddTask keycloak={keycloak}/>
+                    <TaskCenter keycloak={keycloak}/>
                 </div>
             );
         case 'Couriers':
             return (
                 <div>
-                    <ApiCall keycloak={keycloak}/>
+                    <CourierCenter keycloak={keycloak}/>
                 </div>
             );
         default:
