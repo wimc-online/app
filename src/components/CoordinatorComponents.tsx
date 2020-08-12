@@ -3,14 +3,22 @@ import CourierCenter from "./couriers/CourierCenter";
 import {KeycloakInstance} from "keycloak-js";
 import keycloak from "../keycloak";
 import TaskCenter from "./orders/TaskCenter";
+import DeliveryCenter from "./deliveries/DeliveryCenter";
+import {IonButton} from '@ionic/react';
+import AddDelivery from "./deliveries/AddDelivery";
 
 
 interface ContainerProps {
     keycloak: KeycloakInstance,
-    page: string
+    page: string,
+    crud?: string
 }
 
-function renderSwitch({page}: { page: string }) {
+function renderCrud({crud}: { crud: string }) {
+
+}
+
+function renderSwitch({page, crud}: { page: string, crud?: string }) {
     switch (page) {
         case 'Dashboard':
             return (
@@ -18,6 +26,21 @@ function renderSwitch({page}: { page: string }) {
                     Dashboard
                 </div>
             );
+        case 'Deliveries':
+            if (crud === "add") {
+                return (
+                    <div>
+                        <AddDelivery keycloak={keycloak} />
+                    </div>
+                );
+            } else {
+                return (
+                    <div>
+                        <IonButton routerLink='/page/Deliveries/add'>Add</IonButton>
+                        <DeliveryCenter keycloak={keycloak}/>
+                    </div>
+                );
+            }
         case 'Orders':
             return (
                 <div>
@@ -35,12 +58,15 @@ function renderSwitch({page}: { page: string }) {
     }
 }
 
-const CoordinatorComponents: React.FC<ContainerProps> = ({keycloak, page}) => {
-    return (
-        <div>
-            {renderSwitch({page: page})}
-        </div>
-    )
+const CoordinatorComponents: React.FC<ContainerProps> = ({keycloak, page, crud}) => {
+    if (page !== undefined) {
+        return (
+            <div>
+                {renderSwitch({page: page, crud: crud})}
+            </div>
+        )
+    }
+    return (<div></div>);
 };
 
 export default CoordinatorComponents;

@@ -12,7 +12,6 @@ const PrintCouriers: React.FC<ContainerProps> = ({couriers}) => {
         return (
             <div>
                 {couriers.map((courier: any, i: number) => {
-                    console.log(courier);
                     return (
                         <IonCard key={i}>
                             <IonCardHeader>

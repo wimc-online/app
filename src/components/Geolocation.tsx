@@ -16,7 +16,6 @@ const Geolocation: React.FC = () => {
     const containerStyle = {
         width: '100%',
         height: '100vh',
-
     };
 
     const center = {

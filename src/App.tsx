@@ -39,7 +39,7 @@ const App: React.FC = () => {
                     <IonSplitPane contentId="main">
                         <Menu/>
                         <IonRouterOutlet id="main">
-                            <Route path="/page/:name" component={Page}/>
+                            <Route path="/page/:name/:crud?" component={Page}/>
                             <Route path="/" component={LoginPage}/>
                             {/*<Redirect from="/" to="/page/Inbox"/>*/}
                         </IonRouterOutlet>

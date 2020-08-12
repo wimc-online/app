@@ -21,6 +21,7 @@ import CoordinatorComponents from '../components/CoordinatorComponents';
 const Page: React.FC = () => {
 
     const {name} = useParams<{ name: string; }>();
+    const {crud} = useParams<{ crud?: string; }>();
 
     const [keycloak, initialized] = useKeycloak();
     const [profileLoaded, setProfileLoaded] = useState(0);
@@ -31,8 +32,6 @@ const Page: React.FC = () => {
             setProfileLoaded(1);
             keycloak.loadUserProfile().then(result => {
                 setProfile(result);
-                // @ts-ignore
-                // console.log(result["attributes"]["courierId"]);
             });
         }
     });
@@ -55,7 +54,7 @@ const Page: React.FC = () => {
                     <ExploreContainer name={profile.username}/>
                     {keycloak.hasRealmRole('courier')
                         ? <CourierComponents page={name}/>
-                        : <CoordinatorComponents keycloak={keycloak} page={name}/>}
+                        : <CoordinatorComponents keycloak={keycloak} page={name} crud={crud}/>}
                 </IonContent>
             </IonPage>
         );
