@@ -62,6 +62,12 @@ const courierPages: AppPage[] = [
 
 const coordinatorPages: AppPage[] = [
     {
+        title: 'Deliveries',
+        url: '/page/Deliveries',
+        iosIcon: carOutline,
+        mdIcon: carOutline
+    },
+    {
         title: 'Orders',
         url: '/page/Orders',
         iosIcon: cubeOutline,
