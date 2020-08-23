@@ -37,3 +37,27 @@ export function addTask(keycloak, apiEndpoint, signal, data) {
         }
     )
 }
+
+export function confirmTask(keycloak, apiEndpoint, signal, taskId) {
+    // @ts-ignore
+    let courierId = keycloak.profile.attributes.courierId[0];
+    const requestOptions = {
+        method: 'PATCH',
+        headers: {
+            'Content-Type': 'application/merge-patch+json',
+            'Authorization': 'Bearer ' + keycloak.token,
+        },
+        body: JSON.stringify({
+            courier: '/couriers/' + courierId,
+            isProcessing: true
+        }),
+        signal: signal
+    };
+    return fetch(apiEndpoint + taskId, requestOptions)
+        .then(results => {
+            return results.json();
+        }).then(data => {
+            console.log(data);
+        }
+    )
+}

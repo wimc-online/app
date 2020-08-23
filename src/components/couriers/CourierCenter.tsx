@@ -19,6 +19,7 @@ interface ContainerProps {
 
 const CourierCenter: React.FC<ContainerProps> = ({keycloak}) => {
     const [couriers, setCouriers] = useState([]);
+    const [initialized, setInitialized] = useState(false);
     const apiEndpoint = (process.env.NODE_ENV === "development" ? "https://api.wimc.localhost" : "https://api.wimc.online");
     const abortController = new AbortController();
 
@@ -29,20 +30,29 @@ const CourierCenter: React.FC<ContainerProps> = ({keycloak}) => {
     };
 
     useEffect(() => {
-        getCouriers(keycloak, apiEndpoint, abortController.signal).then(response => setCouriers(response));
-        const interval = setInterval(() => {
-            getCouriers(keycloak, apiEndpoint, abortController.signal).then(response => setCouriers(response));
-        }, 10000);
-        return () => {
-            abortController.abort();
-            clearInterval(interval);
+        if (!initialized) {
+            getCouriers(keycloak, apiEndpoint, abortController.signal).then(response => {
+                setCouriers(response);
+                setInitialized(true);
+            });
+        } else {
+            const interval = setInterval(() => {
+                getCouriers(keycloak, apiEndpoint, abortController.signal).then(response => setCouriers(response));
+            }, 10000);
+            return () => {
+                abortController.abort();
+                if (typeof interval !== "undefined") {
+                    clearInterval(interval);
+                }
+            }
         }
-    }, []);
+
+    }, [initialized]);
 
     return (
         <div>
-            {couriers.length > 0 ?
-                <PrintCouriers couriers={couriers} />
+            {typeof couriers != "undefined" && couriers.length > 0 ?
+                <PrintCouriers couriers={couriers}/>
                 : <></>
             }
             <IonButton color="medium" type="button" onClick={handleAddCourierButton}>Add Courier</IonButton>
