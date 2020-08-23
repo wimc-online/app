@@ -14,18 +14,18 @@ const PrintTasks: React.FC<ContainerProps> = ({tasks}) => {
                 {tasks.map((task: any, i: number) => {
                     return (
                         <IonCard key={i}>
-                            <IonCardHeader>
-                                <IonCardTitle>
-                                    Task id: {task.id}
-                                </IonCardTitle>
-                            </IonCardHeader>
-                            <IonCardContent>
-                                Courier: {task.courier} <br/>
-                                Is processing?:
-                                {task.isProcessing
-                                ? <IonIcon slot="start" icon={checkmarkOutline}/>
-                                : <IonIcon icon={closeOutline}/>}
-                            </IonCardContent>
+                             <IonCardHeader>
+                                 <IonCardTitle>
+                                     Task id: {task.id}
+                                 </IonCardTitle>
+                             </IonCardHeader>
+                             <IonCardContent>
+                                 Courier: {task.courier.id} <br/>
+                                 Is processing?:
+                                 {task.isProcessing
+                                 ? <IonIcon slot="start" icon={checkmarkOutline}/>
+                                 : <IonIcon icon={closeOutline}/>}
+                             </IonCardContent>
                         </IonCard>
                     )
                 })}

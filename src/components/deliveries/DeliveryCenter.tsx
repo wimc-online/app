@@ -10,7 +10,7 @@ interface ContainerProps {
     keycloak: KeycloakInstance,
 }
 
-const TaskCenter: React.FC<ContainerProps> = ({keycloak}) => {
+const DeliveryCenter: React.FC<ContainerProps> = ({keycloak}) => {
     const [deliveries, setDeliveries] = useState([]);
     const [deliveriesLoaded, setDeliveriesLoaded] = useState(false);
     const apiEndpoint = (process.env.NODE_ENV === "development" ? "https://api.wimc.localhost" : "https://api.wimc.online");
@@ -18,10 +18,17 @@ const TaskCenter: React.FC<ContainerProps> = ({keycloak}) => {
 
     useEffect(() => {
         getDeliveries(keycloak, apiEndpoint, abortController.signal).then(response => {
-            setDeliveries(response['hydra:member']);
-            setDeliveriesLoaded(true);
+            if (response !== undefined) {
+                setDeliveries(response['hydra:member']);
+                setDeliveriesLoaded(true);
+            }
         });
         const interval = setInterval(() => {
+            getDeliveries(keycloak, apiEndpoint, abortController.signal).then(response => {
+                if (response !== undefined) {
+                    setDeliveries(response['hydra:member']);
+                }
+            });
         }, 10000);
         return () => {
             abortController.abort();
@@ -32,7 +39,7 @@ const TaskCenter: React.FC<ContainerProps> = ({keycloak}) => {
     if (typeof deliveries !== undefined && deliveriesLoaded) {
         return (
             <div>
-                <PrintDeliveries deliveries={deliveries}/>
+                <PrintDeliveries deliveries={deliveries} keycloak={keycloak}/>
             </div>
         )
     } else {
@@ -47,4 +54,4 @@ const TaskCenter: React.FC<ContainerProps> = ({keycloak}) => {
     }
 };
 
-export default TaskCenter;
+export default DeliveryCenter;

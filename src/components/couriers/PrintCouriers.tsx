@@ -8,7 +8,7 @@ interface ContainerProps {
 }
 
 const PrintCouriers: React.FC<ContainerProps> = ({couriers}) => {
-    if (typeof couriers != "undefined") {
+    if (typeof couriers != "undefined" && couriers.length > 0) {
         return (
             <div>
                 {couriers.map((courier: any, i: number) => {
@@ -18,17 +18,19 @@ const PrintCouriers: React.FC<ContainerProps> = ({couriers}) => {
                                 <IonCardSubtitle>{courier.type}</IonCardSubtitle>
                                 <IonCardTitle>{courier.id}</IonCardTitle>
                             </IonCardHeader>
-
                             <IonCardContent>
                                 Courier tasks:
                                 <ul>
-                                    {courier.tasks.map((taskId: any, j: number) => {
-                                        return (
-                                            <li key={j}>
-                                                {taskId}
-                                            </li>
-                                        )
-                                    })}
+                                    {courier.tasks != "undefined" && courier.tasks > 0 
+                                        ? courier.tasks.map((taskId: any, j: number) => {
+                                              return (
+                                                  <li key={j}>
+                                                      {taskId}
+                                                  </li>
+                                              )
+                                          })
+                                        : <></>
+                                    }
                                 </ul>
                             </IonCardContent>
                         </IonCard>

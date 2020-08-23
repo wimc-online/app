@@ -14,10 +14,6 @@ interface ContainerProps {
     crud?: string
 }
 
-function renderCrud({crud}: { crud: string }) {
-
-}
-
 function renderSwitch({page, crud}: { page: string, crud?: string }) {
     switch (page) {
         case 'Dashboard':

@@ -16,7 +16,7 @@ function renderSwitch({page}: { page: string }) {
             return (
                 <div>
                     <TaskApprovalPopup keycloak={keycloak}/>
-                    <Geolocation />
+                    <Geolocation keycloak={keycloak} />
                 </div>
             );
         case 'Orders':

@@ -28,13 +28,13 @@ const TaskCenter: React.FC<ContainerProps> = ({keycloak}) => {
     useEffect(() => {
         getCouriers(keycloak, apiEndpoint, abortController.signal).then(response => setCouriers(response));
         getTasks(keycloak, apiEndpoint, abortController.signal).then(response => setTasks(response));
-        const interval = setInterval(() => {
-            getTasks(keycloak, apiEndpoint, abortController.signal).then(response => setTasks(response));
-            getCouriers(keycloak, apiEndpoint, abortController.signal).then(response => setCouriers(response));
-        }, 10000);
+        // const interval = setInterval(() => {
+        //     getTasks(keycloak, apiEndpoint, abortController.signal).then(response => setTasks(response));
+        //     getCouriers(keycloak, apiEndpoint, abortController.signal).then(response => setCouriers(response));
+        // }, 10000);
         return () => {
-            abortController.abort();
-            clearInterval(interval);
+            // abortController.abort();
+            // clearInterval(interval);
         }
     }, []);
 
@@ -42,7 +42,7 @@ const TaskCenter: React.FC<ContainerProps> = ({keycloak}) => {
         return (
             <div>
                 <PrintTasks tasks={tasks}/>
-                <AddTask keycloak={keycloak} couriers={couriers}/>
+                {/*<AddTask keycloak={keycloak} couriers={couriers}/>*/}
                 <AddSubTask keycloak={keycloak} tasks={tasks}/>
             </div>
         )

@@ -7,6 +7,7 @@ import {Map, TileLayer, Marker, Popup, Circle, withLeaflet} from 'react-leaflet'
 import "./AddDelivery.scss";
 import {add} from "ionicons/icons";
 import {createDelivery} from "../../helpers/DeliveryHelper";
+import {Redirect} from "react-router";
 
 
 interface ContainerProps {
@@ -31,9 +32,7 @@ const AddDelivery: React.FC<ContainerProps> = ({keycloak, deliveries}) => {
         }
     });
 
-    // @ts-ignore
-    const deliverySubmit = (evt) => {
-        evt.preventDefault();
+    const deliverySubmit = () => {
         if (address.length === 0) {
             alert('Set address');
         } else {
@@ -41,7 +40,10 @@ const AddDelivery: React.FC<ContainerProps> = ({keycloak, deliveries}) => {
                 address: address,
                 lat: lat.toString(),
                 lng: lng.toString()
-            }).then(response => console.log(response));
+            }).then(response => {
+                console.log(response);
+                window.location.href = '/page/Deliveries';
+            });
         }
     };
     const center = {
@@ -51,16 +53,20 @@ const AddDelivery: React.FC<ContainerProps> = ({keycloak, deliveries}) => {
 
     const ReactLeafletSearchComponent = withLeaflet(ReactLeafletSearch);
     const confirmAddress = (SearchInfo: any) => {
-        setAddress(SearchInfo.info);
-        setLat(SearchInfo.latLng.lat);
-        setLng(SearchInfo.latLng.lng);
+        createDelivery(keycloak, apiEndpoint, abortController.signal, {
+            address: SearchInfo.info,
+            lat: SearchInfo.latLng.lat.toString(),
+            lng: SearchInfo.latLng.lng.toString()
+        }).then(response => {
+            window.location.href = '/page/Deliveries';
+        });
     };
     const myPopup = (SearchInfo: any) => {
         return (
             <Popup autoClose={false} closeOnClick={false} closeButton={false}>
                 <div>
                     <p>I am a custom popUp</p>
-                    <button onClick={() => confirmAddress(SearchInfo)}>Confirm address</button>
+                    <IonButton color="medium" type="submit" onClick={() => confirmAddress(SearchInfo)}>Confirm address</IonButton>
                 </div>
             </Popup>
         );
@@ -82,13 +88,6 @@ const AddDelivery: React.FC<ContainerProps> = ({keycloak, deliveries}) => {
                 />
                 <ReactLeafletSearchComponent position="topleft" popUp={myPopup} zoom={17}/>
             </Map>
-            <form onSubmit={deliverySubmit}>
-                {/*<label>*/}
-                {/*    Address:<br/>*/}
-                {/*    <input type="text" value={address} onChange={event => setAddress(event.target.value)}/>*/}
-                {/*</label> <br/>*/}
-                <IonButton color="medium" type="submit">Add Delivery</IonButton>
-            </form>
         </div>
     )
 };

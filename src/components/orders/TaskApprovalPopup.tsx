@@ -12,7 +12,8 @@ import {
 } from "@ionic/react";
 import {checkmarkOutline, closeOutline} from "ionicons/icons";
 import {getCouriers} from "../../helpers/CourierHelper";
-import {getTasks} from "../../helpers/TaskHelper";
+import {getTasks, confirmTask} from "../../helpers/TaskHelper";
+import {getDeliveries} from "../../helpers/DeliveryHelper";
 import {KeycloakInstance} from "keycloak-js";
 import "./TaskApprovalPopup.scss";
 
@@ -29,7 +30,6 @@ const PrintTasks: React.FC<ContainerProps> = ({keycloak}) => {
     const progressElement = useRef() as MutableRefObject<HTMLIonProgressBarElement>;
 
     const handleModal = (enable: boolean) => {
-        console.log(progressElement);
         if (enable) {
             if (!showModal) {
                 setShowModal(true);
@@ -41,16 +41,26 @@ const PrintTasks: React.FC<ContainerProps> = ({keycloak}) => {
         }
     };
 
+    const confirmTaskHandler = (taskId: string) => {
+        confirmTask(keycloak, apiEndpoint, abortController.signal, taskId);
+    };
+
     useEffect(() => {
         if (!showModal) {
             getTasks(keycloak, apiEndpoint, abortController.signal).then(response => {
                 abortController.abort();
                 setTasks(response);
-                handleModal(true);
+                if (response.length > 0) {
+                    handleModal(true);
+                }
             });
             const interval = setInterval(() => {
-                getTasks(keycloak, apiEndpoint, abortController.signal).then(response => setTasks(response));
-                handleModal(true);
+                getTasks(keycloak, apiEndpoint, abortController.signal).then(response => {
+                    setTasks(response);
+                    if (response.length > 0) {
+                        handleModal(true);
+                    }
+                });
             }, 10000);
             return () => {
                 abortController.abort();
@@ -77,19 +87,17 @@ const PrintTasks: React.FC<ContainerProps> = ({keycloak}) => {
                                         </IonCardTitle>
                                     </IonCardHeader>
                                     <IonCardContent>
-                                        Courier: {task.courier} <br/>
                                         Is processing?:
                                         {task.isProcessing
                                             ? <IonIcon slot="start" icon={checkmarkOutline}/>
                                             : <IonIcon icon={closeOutline}/>}
+                                        <IonButton onClick={() => confirmTaskHandler(task["@id"])} color="success">Accept</IonButton>
                                     </IonCardContent>
                                 </IonCard>
                             )
                         })}
                         <div className="button-wrapper">
                             <IonProgressBar value={0.5} type="indeterminate" ref={progressElement}></IonProgressBar>
-                            <IonButton onClick={() => handleModal(false)} color="success">Accept</IonButton>
-                            <IonButton onClick={() => handleModal(false)} color="danger">Dissmiss</IonButton>
                         </div>
                     </IonModal>
                 </IonContent>
