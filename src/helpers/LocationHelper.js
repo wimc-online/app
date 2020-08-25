@@ -7,9 +7,9 @@ export function storeLocation(keycloak, apiEndpoint, signal, data) {
         },
         body: JSON.stringify({
             courier: '/couriers/' + data.courier,
-            tmstp: Date.now().toString(),
-            lat: data.lat.toString(),
-            lng: data.lng.toString()
+            tmstp: '@' + Math.floor(Date.now() / 1000).toString(),
+            lat: data.lat.toString().slice(0,9),
+            lng: data.lng.toString().slice(0,9)
         }),
         signal: signal
     };
