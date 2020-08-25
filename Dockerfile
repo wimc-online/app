@@ -26,4 +26,5 @@ RUN set -x \
 
 FROM nginx:1.19.1 as app
 
+COPY rootfs /
 COPY --from=builder /app/build /usr/share/nginx/html
