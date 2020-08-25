@@ -68,7 +68,7 @@ const Geolocation: React.FC<ContainerProps> = ({keycloak}) => {
                             setlng(position.coords.longitude);
                             setAccuracy(position.coords.accuracy);
                         }
-                        // updatePosition(position.coords.latitude, position.coords.longitude);
+                        updatePosition(position.coords.latitude, position.coords.longitude);
                     }, (err) => {
                         console.log(err)
                     });
@@ -84,7 +84,6 @@ const Geolocation: React.FC<ContainerProps> = ({keycloak}) => {
                     }
                     // @ts-ignore
                     map.current.leafletElement.flyTo([position.coords.latitude, position.coords.longitude], 16);
-                    // map.current.flyTo([position.coords.latitude, position.coords.longitude], 10);
                 }, (err) => {
                     console.log(err)
                 });
