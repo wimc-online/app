@@ -75,7 +75,6 @@ const Geolocation: React.FC<ContainerProps> = ({keycloak}) => {
                 }, 5000);
                 return () => clearInterval(interval)
             } else {
-                console.log('main');
                 navigator.geolocation.getCurrentPosition((position) => {
                     if (typeof position.coords != 'undefined') {
                         setLat(position.coords.latitude);

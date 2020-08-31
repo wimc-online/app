@@ -2,10 +2,11 @@ import React from 'react';
 import CourierCenter from "./couriers/CourierCenter";
 import {KeycloakInstance} from "keycloak-js";
 import keycloak from "../keycloak";
-import TaskCenter from "./orders/TaskCenter";
+import TaskCenter from "./tasks/TaskCenter";
 import DeliveryCenter from "./deliveries/DeliveryCenter";
-import {IonButton} from '@ionic/react';
+import {IonButton, IonGrid, IonRow, IonCol, CreateAnimation} from '@ionic/react';
 import AddDelivery from "./deliveries/AddDelivery";
+import AssignCourierTutorialModal from "./tutorials/AssignCourierTutorialModal";
 
 
 interface ContainerProps {
@@ -14,26 +15,100 @@ interface ContainerProps {
     crud?: string
 }
 
-function renderSwitch({page, crud}: { page: string, crud?: string }) {
+function renderSwitch({page, crud}: { page: string, crud?: string, keycloak?: KeycloakInstance }) {
     switch (page) {
         case 'Dashboard':
             return (
-                <div>
-                    Dashboard
-                </div>
+                <IonGrid>
+                    <IonRow>
+                        <IonCol size="12">
+                            <img src="/assets/logos/logo-wimc-gray.png" alt=""
+                                 className="ion-margin-bottom ion-margin-top"/>
+                            <CreateAnimation
+                                duration={700}
+                                iterations={1}
+                                fromTo={[
+                                    {property: 'transform', fromValue: 'translateX(100px)', toValue: 'translateX(0)'},
+                                    {property: 'opacity', fromValue: '0', toValue: '1'}
+                                ]}
+                                play={true}
+                            >
+                                <h2>
+                                    Oh... Hi{keycloak.profile !== undefined
+                                    ? ' ' + keycloak.profile.firstName + '!'
+                                    : '!'}
+                                </h2>
+                                <p>
+                                    What are we doing today?
+                                </p>
+                            </CreateAnimation>
+                        </IonCol>
+                        <IonCol size="12" sizeXl="4">
+                            <CreateAnimation
+                                duration={700}
+                                delay={1500}
+                                iterations={1}
+                                fromTo={[
+                                    {property: 'transform', fromValue: 'translateX(100px)', toValue: 'translateX(0)'},
+                                    {property: 'opacity', fromValue: '0', toValue: '1'}
+                                ]}
+                                play={true}
+                            >
+                                <IonButton routerLink='/page/Deliveries' expand="full">Show deliveries</IonButton>
+                            </CreateAnimation>
+                        </IonCol>
+                        <IonCol size="12" sizeXl="4">
+                            <CreateAnimation
+                                duration={700}
+                                delay={1700}
+                                iterations={1}
+                                fromTo={[
+                                    {property: 'transform', fromValue: 'translateX(100px)', toValue: 'translateX(0)'},
+                                    {property: 'opacity', fromValue: '0', toValue: '1'}
+                                ]}
+                                play={true}
+                            >
+                                <IonButton routerLink='/page/Orders' expand="full">Check orders</IonButton>
+                            </CreateAnimation>
+                        </IonCol>
+                        <IonCol size="12" sizeXl="4">
+                            <CreateAnimation
+                                duration={700}
+                                delay={1900}
+                                iterations={1}
+                                fromTo={[
+                                    {property: 'transform', fromValue: 'translateX(100px)', toValue: 'translateX(0)'},
+                                    {property: 'opacity', fromValue: '0', toValue: '1'}
+                                ]}
+                                play={true}
+                            >
+                                <IonButton routerLink='/page/Couriers' expand="full">Show couriers</IonButton>
+                            </CreateAnimation>
+                        </IonCol>
+                    </IonRow>
+                </IonGrid>
             );
         case 'Deliveries':
             if (crud === "add") {
                 return (
                     <div>
-                        <AddDelivery keycloak={keycloak} />
+                        <AddDelivery keycloak={keycloak}/>
                     </div>
                 );
             } else {
                 return (
                     <div>
-                        <IonButton routerLink='/page/Deliveries/add'>Add</IonButton>
-                        <DeliveryCenter keycloak={keycloak}/>
+                        <IonGrid>
+                            <IonRow>
+                                <AssignCourierTutorialModal />
+                                <IonCol size="12">
+                                    <IonButton routerLink='/page/Deliveries/add' expand="full">Add</IonButton>
+                                </IonCol>
+                                <IonCol size="12">
+                                    <DeliveryCenter keycloak={keycloak}/>
+                                </IonCol>
+                            </IonRow>
+                        </IonGrid>
                     </div>
                 );
             }
@@ -58,7 +133,7 @@ const CoordinatorComponents: React.FC<ContainerProps> = ({keycloak, page, crud})
     if (page !== undefined) {
         return (
             <div>
-                {renderSwitch({page: page, crud: crud})}
+                {renderSwitch({page: page, crud: crud, keycloak: keycloak})}
             </div>
         )
     }

@@ -13,13 +13,8 @@ import {
 import React, {useEffect, useState} from 'react';
 import {useLocation} from 'react-router-dom';
 import {
-    bookmarkOutline,
-    heartOutline,
-    heartSharp,
     mailOutline,
     mailSharp,
-    paperPlaneOutline,
-    paperPlaneSharp,
     cubeOutline,
     folderOpenOutline,
     logOutOutline,
@@ -27,7 +22,6 @@ import {
 } from 'ionicons/icons';
 import './Menu.scss';
 import {useKeycloak} from "@react-keycloak/web";
-import keycloak from "../keycloak";
 
 interface AppPage {
     url: string;
@@ -68,8 +62,8 @@ const coordinatorPages: AppPage[] = [
         mdIcon: carOutline
     },
     {
-        title: 'Orders',
-        url: '/page/Orders',
+        title: 'Tasks',
+        url: '/page/Tasks',
         iosIcon: cubeOutline,
         mdIcon: cubeOutline
     },
@@ -85,14 +79,16 @@ const coordinatorPages: AppPage[] = [
 const Menu: React.FC = () => {
     const location = useLocation();
     const [keycloak, initialized] = useKeycloak();
-    const [name, setName] = useState<string>();
+    const [fullname, setFullname] = useState<string>();
+    const [username, setUsername] = useState<string>();
     const [email, setEmail] = useState<string>();
 
     useEffect(() => {
         if (initialized) {
             keycloak.loadUserProfile().then(result => {
+                setFullname(result.firstName + " " + result.lastName);
                 setEmail(result.email);
-                setName(result.username);
+                setUsername(result.username);
             })
         }
     });
@@ -133,14 +129,17 @@ const Menu: React.FC = () => {
                 </div>
             );
         }
-        return (<div></div>);
+        return (<></>);
     };
     return (
         <IonMenu contentId="main" type="overlay">
             <IonContent>
                 <IonList id="inbox-list">
-                    <IonListHeader>username: {name}</IonListHeader>
-                    <IonNote>{email}</IonNote>
+                    <IonListHeader>{fullname}</IonListHeader>
+                    <IonNote>
+                        username: {username} <br/>
+                        {email}
+                    </IonNote>
                     {appPages.map((appPage, index) => {
                         return (
                             <IonMenuToggle key={index} autoHide={false}>

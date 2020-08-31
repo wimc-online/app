@@ -11,6 +11,10 @@
         background: linear-gradient(180.2deg, #242424 13.33%, rgba(36, 36, 36, 0) 97.59%), url(/assets/mapmobile.png) no-repeat center center fixed;
         background-size: auto 100%;
     }
+
+    .modal-wrapper & {
+
+    }
 }
 ion-content {
     --background: transparent;
@@ -21,4 +25,9 @@ body {
 
 .d-none {
     display: none;
+}
+
+h2 {
+    font-weight: bold;
+    font-size: 2rem;
 }

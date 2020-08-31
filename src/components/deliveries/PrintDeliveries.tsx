@@ -1,10 +1,24 @@
 import React, {useEffect, useState} from 'react';
-import {IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonIcon, IonButton} from "@ionic/react";
-import {checkmarkOutline, closeOutline} from "ionicons/icons";
-import {getDeliveries, assignCourierToDelivery} from "../../helpers/DeliveryHelper";
+import {
+    IonCard,
+    IonCardHeader,
+    IonCardTitle,
+    IonCardContent,
+    IonButton,
+    IonAlert,
+    IonSelect, IonSelectOption, IonItem, IonLabel
+} from "@ionic/react";
+import {assignCourierToDelivery} from "../../helpers/DeliveryHelper";
 import {getCouriers} from "../../helpers/CourierHelper";
 import {KeycloakInstance} from "keycloak-js";
-
+// @ts-ignore
+import {Map, TileLayer, Marker} from 'react-leaflet';
+// @ts-ignore
+import Leaflet from 'leaflet';
+import icon from 'leaflet/dist/images/marker-icon.png';
+import iconShadow from 'leaflet/dist/images/marker-shadow.png';
+import "./PrintDeliveries.scss"
+import 'leaflet/dist/leaflet.css';
 
 interface ContainerProps {
     deliveries?: never[],
@@ -15,9 +29,9 @@ const PrintDeliveries: React.FC<ContainerProps> = ({deliveries, keycloak}) => {
     const [courier, setCourier] = useState('');
     const [delivery, setDelivery] = useState<string>();
     const [couriers, setCouriers] = useState([]);
+    const [loadMaps, setLoadMaps] = useState(false);
     const apiEndpoint = (process.env.NODE_ENV === "development" ? "https://api.wimc.localhost" : "https://api.wimc.online");
     const abortController = new AbortController();
-
 
     useEffect(() => {
         getCouriers(keycloak, apiEndpoint, abortController.signal).then(response => {
@@ -33,6 +47,21 @@ const PrintDeliveries: React.FC<ContainerProps> = ({deliveries, keycloak}) => {
         };
     }, []);
 
+    useEffect(() => {
+        setTimeout(() => {
+            if (!loadMaps) {
+                setLoadMaps(true);
+            }
+        }, 1000);
+    }, [loadMaps]);
+
+    let DefaultIcon = Leaflet.icon({
+        iconUrl: icon,
+        shadowUrl: iconShadow,
+        iconSize: [24, 36],
+        iconAnchor: [12, 36]
+    });
+
     // @ts-ignore
     const formSubmit = (evt) => {
         evt.preventDefault();
@@ -40,36 +69,51 @@ const PrintDeliveries: React.FC<ContainerProps> = ({deliveries, keycloak}) => {
             keycloak,
             apiEndpoint,
             abortController.signal,
-            {courier: courier, delivery_id: delivery}).then(result => console.log(result));
+            {courier: courier, delivery_id: delivery}).then();
     };
 
     // @ts-ignore
     const RenderForm = ({deliveryId}) => {
         return (
             <form onSubmit={formSubmit}>
-                <label>
-                    Courier:<br/>
-                    <select value={courier} id=""
-                            onChange={event => {
-                                setCourier(event.target.value);
-                                setDelivery(deliveryId);
-                            }}>
-                        <option value="">Select courier</option>
+                <IonItem>
+                    <IonLabel>Pick courier</IonLabel>
+                    <IonSelect value={courier} id=""
+                               placeholder="Select courier"
+                               onIonChange={e => {
+                                   setCourier(e.detail.value);
+                                   setDelivery(deliveryId);
+                               }}>
                         {couriers.map((courier: any, i: number) => {
                             return (
-                                <option key={i} value={courier["@id"]}>{courier.id}</option>
+                                <IonSelectOption key={i} value={courier["@id"]}>{courier.id}</IonSelectOption>
                             )
                         })}
-                    </select>
-                </label> <br/>
-                <IonButton color="medium" type="submit">Assign Courier</IonButton>
+                    </IonSelect>
+                </IonItem>
+                <IonButton expand="full" type="submit">Assign Courier</IonButton>
             </form>
         )
     };
 
-    if (typeof deliveries != "undefined") {
+    // @ts-ignore
+    const RenderMap = ({lat, lng, index}) => {
+        return (
+            <Map center={{lat, lng}} zoom={16}
+                 className="print-deliveries-map" useFlyTo={true} scrollWheelZoom={false}>
+                <TileLayer
+                    attribution='&amp;copy <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                />
+                <Marker position={{lat, lng}} icon={DefaultIcon}/>
+            </Map>
+        )
+    }
+
+    if (typeof deliveries != "undefined" && deliveries.length !== 0) {
         return (
             <div>
+                <h2>Current deliveries:</h2>
                 {deliveries.map((delivery: any, i: number) => {
                     return (
                         <IonCard key={i}>
@@ -80,6 +124,9 @@ const PrintDeliveries: React.FC<ContainerProps> = ({deliveries, keycloak}) => {
                             </IonCardHeader>
                             <IonCardContent>
                                 Address: {delivery.address} <br/>
+                                {loadMaps ?
+                                    <RenderMap lat={delivery.lat} lng={delivery.lng} index={i}/>
+                                    : <></>}
                                 {couriers.length > 0
                                     ? <RenderForm deliveryId={delivery.id}/>
                                     : <></>}
@@ -90,7 +137,15 @@ const PrintDeliveries: React.FC<ContainerProps> = ({deliveries, keycloak}) => {
             </div>
         )
     } else {
-        return (<></>);
+        return (
+            <IonAlert
+                isOpen={true}
+                cssClass='my-custom-class'
+                header={'There\'s nothing yet :('}
+                message={'There are no active deliveries at this moment'}
+                buttons={['Copy that']}
+            />
+        );
     }
 };
 

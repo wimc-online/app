@@ -1,3 +1,13 @@
 .form-map {
-  height: 40vh;
+  height: 100vh;
+}
+
+ion-icon.icon-big {
+  width: 100px;
+  height: 100px;
+}
+
+.mapPopup {
+  .leaflet-popup-content {
+  }
 }

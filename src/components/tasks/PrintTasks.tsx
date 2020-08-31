@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonIcon} from "@ionic/react";
+import {IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonIcon, IonAlert} from "@ionic/react";
 import {checkmarkOutline, closeOutline} from "ionicons/icons";
 
 
@@ -8,7 +8,7 @@ interface ContainerProps {
 }
 
 const PrintTasks: React.FC<ContainerProps> = ({tasks}) => {
-    if (typeof tasks != "undefined") {
+    if (typeof tasks != "undefined" && tasks.length > 0) {
         return (
             <div>
                 {tasks.map((task: any, i: number) => {
@@ -32,7 +32,15 @@ const PrintTasks: React.FC<ContainerProps> = ({tasks}) => {
             </div>
         )
     } else {
-        return (<></>);
+        return (
+            <IonAlert
+                isOpen={true}
+                cssClass='my-custom-class'
+                header={'There\'s nothing yet :('}
+                message={'There are no active tasks at this moment'}
+                buttons={['Copy that']}
+            />
+        );
     }
 };
 

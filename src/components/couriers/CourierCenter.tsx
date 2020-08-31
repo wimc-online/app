@@ -1,15 +1,9 @@
-import React, {Component, useEffect, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {KeycloakInstance} from "keycloak-js";
-import keycloak from "../../keycloak";
 import "../../helpers/CourierHelper";
 import {getCouriers, addCourier} from "../../helpers/CourierHelper";
 import {
-    IonButton,
-    IonCard,
-    IonCardHeader,
-    IonCardSubtitle,
-    IonCardTitle,
-    IonCardContent
+    IonButton, IonGrid, IonRow, IonCol, IonAlert
 } from "@ionic/react";
 import PrintCouriers from "./PrintCouriers";
 
@@ -50,13 +44,25 @@ const CourierCenter: React.FC<ContainerProps> = ({keycloak}) => {
     }, [initialized]);
 
     return (
-        <div>
-            {typeof couriers != "undefined" && couriers.length > 0 ?
-                <PrintCouriers couriers={couriers}/>
-                : <></>
-            }
-            <IonButton color="medium" type="button" onClick={handleAddCourierButton}>Add Courier</IonButton>
-        </div>
+        <IonGrid>
+            <IonRow>
+                <IonCol size="12">
+                    <IonButton expand="full" onClick={handleAddCourierButton}>Add Courier</IonButton>
+                </IonCol>
+                <IonCol size="12">
+                    {typeof couriers != "undefined" && couriers.length > 0 ?
+                        <PrintCouriers couriers={couriers}/>
+                        : <IonAlert
+                            isOpen={true}
+                            cssClass='my-custom-class'
+                            header={'There\'s nothing yet :('}
+                            message={'There are no active couriers at this moment'}
+                            buttons={['Copy that']}
+                        />
+                    }
+                </IonCol>
+            </IonRow>
+        </IonGrid>
     )
 };
 
