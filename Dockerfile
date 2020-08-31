@@ -2,8 +2,7 @@ FROM node:12.18.2 as builder
 
 ENV APP_ROOT=/app \
     NPM_CONFIG_PREFIX=/home/node/.npm-global \
-    PATH=$PATH:/home/node/.npm-global/bin \
-    NODE_ENV=production
+    PATH=$PATH:/home/node/.npm-global/bin
 WORKDIR $APP_ROOT
 RUN set -x \
  && chown node $APP_ROOT
