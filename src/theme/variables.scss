@@ -3,6 +3,13 @@ http://ionicframework.com/docs/theming/ */
 
 /** Ionic CSS Variables **/
 :root {
+  --ion-grid-columns:               12;
+  --ion-grid-width-xs:              100%;
+  --ion-grid-width-sm:              540px;
+  --ion-grid-width-md:              720px;
+  --ion-grid-width-lg:              960px;
+  --ion-grid-width-xl:              1140px;
+
   /** primary **/
   --ion-color-primary: #3880ff;
   --ion-color-primary-rgb: 56, 128, 255;

@@ -1,10 +1,9 @@
-import React, {MutableRefObject, useEffect, useRef, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {KeycloakInstance} from "keycloak-js";
 import "./AddTask.scss";
-import {IonLoading} from "@ionic/react";
-import AddTask from './AddTask';
+import {IonCol, IonGrid, IonLoading, IonRow} from "@ionic/react";
 import AddSubTask from './AddSubTask';
-import {addTask, getTasks} from "../../helpers/TaskHelper";
+import {getTasks} from "../../helpers/TaskHelper";
 import {getCouriers} from '../../helpers/CourierHelper';
 import PrintTasks from "./PrintTasks";
 
@@ -19,11 +18,6 @@ const TaskCenter: React.FC<ContainerProps> = ({keycloak}) => {
     const [couriers, setCouriers] = useState([]);
     const apiEndpoint = (process.env.NODE_ENV === "development" ? "https://api.wimc.localhost" : "https://api.wimc.online");
     const abortController = new AbortController();
-
-
-    const addTaskHandler = () => {
-        addTask(keycloak, apiEndpoint, abortController, {courier: courier}).then(response => console.log(response));
-    };
 
     useEffect(() => {
         getCouriers(keycloak, apiEndpoint, abortController.signal).then(response => setCouriers(response));
@@ -42,18 +36,24 @@ const TaskCenter: React.FC<ContainerProps> = ({keycloak}) => {
         return (
             <div>
                 <PrintTasks tasks={tasks}/>
-                {/*<AddTask keycloak={keycloak} couriers={couriers}/>*/}
                 <AddSubTask keycloak={keycloak} tasks={tasks}/>
             </div>
         )
     } else {
         return (
-            <IonLoading
-                cssClass='my-custom-class'
-                isOpen={true}
-                message={'Please wait...'}
-                duration={5000}
-            />
+            <IonGrid>
+                <IonRow>
+                    <IonCol>
+                        <IonLoading
+                            cssClass='my-custom-class'
+                            isOpen={true}
+                            message={'Please wait...'}
+                            duration={5000}
+                        />
+                        <h2>There are no current task available.</h2>
+                    </IonCol>
+                </IonRow>
+            </IonGrid>
         );
     }
 };

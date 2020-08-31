@@ -1,10 +1,7 @@
 import React from 'react';
 import Geolocation from "./Geolocation";
-import TaskApprovalPopup from "./orders/TaskApprovalPopup";
-import CourierCenter from "./couriers/CourierCenter";
+import TaskApprovalPopup from "./tasks/TaskApprovalPopup";
 import keycloak from "../keycloak";
-import AddTask from "./orders/AddTask";
-import {KeycloakInstance} from "keycloak-js";
 
 interface ContainerProps {
     page: string

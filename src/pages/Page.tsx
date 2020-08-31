@@ -10,7 +10,6 @@ import {
 } from '@ionic/react';
 import React, {useState, useEffect} from 'react';
 import {useParams} from 'react-router';
-import ExploreContainer from '../components/ExploreContainer';
 import './Page.scss';
 import {useKeycloak} from "@react-keycloak/web";
 import {KeycloakProfile} from "keycloak-js";
@@ -26,6 +25,7 @@ const Page: React.FC = () => {
     const [keycloak, initialized] = useKeycloak();
     const [profileLoaded, setProfileLoaded] = useState(0);
     const [profile, setProfile] = useState<KeycloakProfile>();
+
 
     useEffect(() => {
         if (initialized && profileLoaded === 0) {
@@ -51,7 +51,6 @@ const Page: React.FC = () => {
                 </IonHeader>
 
                 <IonContent>
-                    <ExploreContainer name={profile.username}/>
                     {keycloak.hasRealmRole('courier')
                         ? <CourierComponents page={name}/>
                         : <CoordinatorComponents keycloak={keycloak} page={name} crud={crud}/>}

@@ -1,7 +1,5 @@
-import React, {useEffect, useState} from 'react';
-import {IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonIcon, IonCardSubtitle} from "@ionic/react";
-import {checkmarkOutline, closeOutline} from "ionicons/icons";
-
+import React from 'react';
+import {IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonCardSubtitle} from "@ionic/react";
 
 interface ContainerProps {
     couriers?: never[]
