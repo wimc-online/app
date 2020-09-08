@@ -2,6 +2,7 @@ import React from 'react';
 import Geolocation from "./Geolocation";
 import TaskApprovalPopup from "./tasks/TaskApprovalPopup";
 import keycloak from "../keycloak";
+import LocationWatch from "./locations/LocationWatch";
 
 interface ContainerProps {
     page: string
@@ -30,6 +31,7 @@ function renderSwitch({page}: { page: string }) {
 const CourierComponents: React.FC<ContainerProps> = ({page}) => {
     return (
         <div>
+            <LocationWatch keycloak={keycloak}/>
             {renderSwitch({page: page})}
         </div>
     )

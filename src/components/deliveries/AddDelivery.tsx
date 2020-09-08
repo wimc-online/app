@@ -16,7 +16,6 @@ interface ContainerProps {
 
 const AddDelivery: React.FC<ContainerProps> = ({keycloak, deliveries}) => {
     const [address, setAddress] = useState("");
-    const apiEndpoint = (process.env.NODE_ENV === "development" ? "https://api.wimc.localhost" : "https://api.wimc.online");
     const abortController = new AbortController();
     const [lat, setLat] = useState<number>(0);
     const [lng, setLng] = useState<number>(0);
@@ -36,7 +35,7 @@ const AddDelivery: React.FC<ContainerProps> = ({keycloak, deliveries}) => {
 
     const ReactLeafletSearchComponent = withLeaflet(ReactLeafletSearch);
     const confirmAddress = (SearchInfo: any) => {
-        createDelivery(keycloak, apiEndpoint, abortController.signal, {
+        createDelivery(keycloak, abortController.signal, {
             address: SearchInfo.info,
             lat: SearchInfo.latLng.lat.toString(),
             lng: SearchInfo.latLng.lng.toString()

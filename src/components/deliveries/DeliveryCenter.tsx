@@ -11,13 +11,12 @@ interface ContainerProps {
 const DeliveryCenter: React.FC<ContainerProps> = ({keycloak}) => {
     const [deliveries, setDeliveries] = useState([]);
     const [deliveriesLoaded, setDeliveriesLoaded] = useState(false);
-    const apiEndpoint = (process.env.NODE_ENV === "development" ? "https://api.wimc.localhost" : "https://api.wimc.online");
     const abortController = new AbortController();
     const isEqual = require("react-fast-compare");
 
     useEffect(() => {
         if (!deliveriesLoaded) {
-            getDeliveries(keycloak, apiEndpoint, abortController.signal).then(response => {
+            getDeliveries(keycloak, abortController.signal).then(response => {
                 if (response !== undefined) {
                     setDeliveries(response['hydra:member']);
                     setDeliveriesLoaded(true);
@@ -25,7 +24,7 @@ const DeliveryCenter: React.FC<ContainerProps> = ({keycloak}) => {
             });
         }
         const interval = setInterval(() => {
-            getDeliveries(keycloak, apiEndpoint, abortController.signal).then(response => {
+            getDeliveries(keycloak, abortController.signal).then(response => {
                 if (response !== undefined) {
                     if (!isEqual(deliveries, response['hydra:member'])) {
                         setDeliveries(response['hydra:member']);

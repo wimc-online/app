@@ -6,32 +6,34 @@ import {
     IonButton, IonGrid, IonRow, IonCol, IonAlert
 } from "@ionic/react";
 import PrintCouriers from "./PrintCouriers";
+import CourierPositionsMap from "./../locations/CourierPositionsMap";
+import AddCourierForm from './AddCourierForm';
 
 interface ContainerProps {
     keycloak: KeycloakInstance;
 }
 
 const CourierCenter: React.FC<ContainerProps> = ({keycloak}) => {
-    const [couriers, setCouriers] = useState([]);
+    const [couriers, setCouriers] = useState<[]>([]);
     const [initialized, setInitialized] = useState(false);
-    const apiEndpoint = (process.env.NODE_ENV === "development" ? "https://api.wimc.localhost" : "https://api.wimc.online");
     const abortController = new AbortController();
-
-    const handleAddCourierButton = () => {
-        addCourier(keycloak, apiEndpoint, abortController.signal).then(response => {
-            getCouriers(keycloak, apiEndpoint, abortController.signal).then(response => setCouriers(response));
-        });
-    };
+    const isEqual = require("react-fast-compare");
 
     useEffect(() => {
         if (!initialized) {
-            getCouriers(keycloak, apiEndpoint, abortController.signal).then(response => {
+            getCouriers(keycloak, abortController.signal).then(response => {
                 setCouriers(response);
                 setInitialized(true);
             });
         } else {
             const interval = setInterval(() => {
-                getCouriers(keycloak, apiEndpoint, abortController.signal).then(response => setCouriers(response));
+                getCouriers(keycloak, abortController.signal).then(response => {
+                    if (response !== undefined) {
+                        if (!isEqual(couriers, response)) {
+                            setCouriers(response)
+                        }
+                    }
+                });
             }, 10000);
             return () => {
                 abortController.abort();
@@ -43,21 +45,28 @@ const CourierCenter: React.FC<ContainerProps> = ({keycloak}) => {
 
     }, [initialized]);
 
+    const RenderElements = () => {
+        return (
+            <div>
+                <PrintCouriers couriers={couriers}/>
+                <CourierPositionsMap keycloak={keycloak} couriers={couriers}/>
+            </div>
+        )
+    }
+
     return (
         <IonGrid>
             <IonRow>
                 <IonCol size="12">
-                    <IonButton expand="full" onClick={handleAddCourierButton}>Add Courier</IonButton>
-                </IonCol>
-                <IonCol size="12">
-                    {typeof couriers != "undefined" && couriers.length > 0 ?
-                        <PrintCouriers couriers={couriers}/>
+                    <AddCourierForm keycloak={keycloak} />
+                    {initialized && typeof couriers !== undefined && couriers.length > 0 ?
+                        <RenderElements />
                         : <IonAlert
-                            isOpen={true}
-                            cssClass='my-custom-class'
-                            header={'There\'s nothing yet :('}
-                            message={'There are no active couriers at this moment'}
-                            buttons={['Copy that']}
+                        isOpen={true}
+                        cssClass='my-custom-class'
+                        header={'There\'s nothing yet :('}
+                        message={'There are no active couriers at this moment'}
+                        buttons={['Copy that']}
                         />
                     }
                 </IonCol>

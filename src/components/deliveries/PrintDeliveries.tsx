@@ -6,7 +6,7 @@ import {
     IonCardContent,
     IonButton,
     IonAlert,
-    IonSelect, IonSelectOption, IonItem, IonLabel
+    IonSelect, IonSelectOption, IonItem, IonLabel, IonCardSubtitle
 } from "@ionic/react";
 import {assignCourierToDelivery} from "../../helpers/DeliveryHelper";
 import {getCouriers} from "../../helpers/CourierHelper";
@@ -19,6 +19,8 @@ import icon from 'leaflet/dist/images/marker-icon.png';
 import iconShadow from 'leaflet/dist/images/marker-shadow.png';
 import "./PrintDeliveries.scss"
 import 'leaflet/dist/leaflet.css';
+import {getUserDetailedData} from "../../helpers/KeycloakHelper";
+import RenderAssignedCourier from './RenderAssignedCourier';
 
 interface ContainerProps {
     deliveries?: never[],
@@ -26,15 +28,14 @@ interface ContainerProps {
 }
 
 const PrintDeliveries: React.FC<ContainerProps> = ({deliveries, keycloak}) => {
-    const [courier, setCourier] = useState('');
-    const [delivery, setDelivery] = useState<string>();
+    const [courier, setCourier] = useState<any>({});
+    const [delivery, setDelivery] = useState<string>('');
     const [couriers, setCouriers] = useState([]);
     const [loadMaps, setLoadMaps] = useState(false);
-    const apiEndpoint = (process.env.NODE_ENV === "development" ? "https://api.wimc.localhost" : "https://api.wimc.online");
     const abortController = new AbortController();
 
     useEffect(() => {
-        getCouriers(keycloak, apiEndpoint, abortController.signal).then(response => {
+        getCouriers(keycloak, abortController.signal).then(response => {
             if (response !== undefined) {
                 setCouriers(response);
             }
@@ -67,23 +68,44 @@ const PrintDeliveries: React.FC<ContainerProps> = ({deliveries, keycloak}) => {
         evt.preventDefault();
         assignCourierToDelivery(
             keycloak,
-            apiEndpoint,
             abortController.signal,
-            {courier: courier, delivery_id: delivery}).then();
+            {courier: courier[delivery], delivery_id: delivery})
+            .then(() => {
+                    return (
+                        <IonAlert
+                            isOpen={true}
+                            header={'Good job!'}
+                            message={'Delivery has been successfully assigned!'}
+                            buttons={['That\'s awesome!']}
+                        />
+                    );
+                }
+            ).catch(() => {
+                return (<IonAlert
+                    isOpen={true}
+                    header={'Good job!'}
+                    message={'Delivery has been successfully assigned!'}
+                    buttons={['That\'s awesome!']}
+                />)
+            }
+        )
     };
 
-    // @ts-ignore
-    const RenderForm = ({deliveryId}) => {
+    const handleSelectChange = (e: CustomEvent, deliveryId: string) => {
+        setCourier({[`${deliveryId}`]: e.detail.value});
+        setDelivery(deliveryId);
+    };
+
+    const RenderForm: React.FC<{ deliveryId: string }> = ({deliveryId}) => {
         return (
             <form onSubmit={formSubmit}>
                 <IonItem>
                     <IonLabel>Pick courier</IonLabel>
-                    <IonSelect value={courier} id=""
+                    <IonSelect value={courier[deliveryId]} id={"courier-select-" + deliveryId}
                                placeholder="Select courier"
-                               onIonChange={e => {
-                                   setCourier(e.detail.value);
-                                   setDelivery(deliveryId);
-                               }}>
+                               onIonChange={(e => {
+                                   handleSelectChange(e, deliveryId);
+                               })}>
                         {couriers.map((courier: any, i: number) => {
                             return (
                                 <IonSelectOption key={i} value={courier["@id"]}>{courier.id}</IonSelectOption>
@@ -115,6 +137,7 @@ const PrintDeliveries: React.FC<ContainerProps> = ({deliveries, keycloak}) => {
             <div>
                 <h2>Current deliveries:</h2>
                 {deliveries.map((delivery: any, i: number) => {
+                    let deliveryId: string = delivery.id;
                     return (
                         <IonCard key={i}>
                             <IonCardHeader>
@@ -124,12 +147,18 @@ const PrintDeliveries: React.FC<ContainerProps> = ({deliveries, keycloak}) => {
                             </IonCardHeader>
                             <IonCardContent>
                                 Address: {delivery.address} <br/>
-                                {loadMaps ?
-                                    <RenderMap lat={delivery.lat} lng={delivery.lng} index={i}/>
+                                {loadMaps
+                                    ? <RenderMap lat={delivery.lat} lng={delivery.lng} index={i}/>
                                     : <></>}
-                                {couriers.length > 0
-                                    ? <RenderForm deliveryId={delivery.id}/>
-                                    : <></>}
+                                {delivery.courier == undefined
+                                    ? <>
+                                        {couriers.length > 0
+                                            ? <RenderForm deliveryId={deliveryId}/>
+                                            : <IonCardSubtitle>There are no accessible couriers right now.</IonCardSubtitle>}
+                                    </>
+                                    : <RenderAssignedCourier courierId={delivery.courier.id} deliveryId={delivery.id}/>
+                                }
+
                             </IonCardContent>
                         </IonCard>
                     )

@@ -14,3 +14,8 @@ command -v docker
 # build docker image
 docker build -t docker.pkg.github.com/wimc-online/app/app:latest .
 ```
+
+## Prepare environment variables
+```shell script
+cp .env.dev.dist .env
+```

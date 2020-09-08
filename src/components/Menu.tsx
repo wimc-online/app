@@ -61,12 +61,12 @@ const coordinatorPages: AppPage[] = [
         iosIcon: carOutline,
         mdIcon: carOutline
     },
-    {
-        title: 'Tasks',
-        url: '/page/Tasks',
-        iosIcon: cubeOutline,
-        mdIcon: cubeOutline
-    },
+    // {
+    //     title: 'Tasks',
+    //     url: '/page/Tasks',
+    //     iosIcon: cubeOutline,
+    //     mdIcon: cubeOutline
+    // },
     {
         title: 'Couriers',
         url: '/page/Couriers',
