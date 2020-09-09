@@ -8,11 +8,11 @@ import {
     IonContent,
     IonModal,
     IonButton,
-    IonProgressBar
+    IonProgressBar, IonRow, IonGrid, IonCol
 } from "@ionic/react";
 import {checkmarkOutline, closeOutline} from "ionicons/icons";
 import {getCouriers} from "../../helpers/CourierHelper";
-import {getTasks, confirmTask} from "../../helpers/TaskHelper";
+import {getTasks, confirmTask, getTasksForCourier} from "../../helpers/TaskHelper";
 import {getDeliveries} from "../../helpers/DeliveryHelper";
 import {KeycloakInstance} from "keycloak-js";
 import "./TaskApprovalPopup.scss";
@@ -23,7 +23,6 @@ interface ContainerProps {
 }
 
 const PrintTasks: React.FC<ContainerProps> = ({keycloak}) => {
-    const apiEndpoint = (process.env.NODE_ENV === "development" ? "https://api.wimc.localhost" : "https://api.wimc.online");
     const [tasks, setTasks] = useState([]);
     const abortController = new AbortController();
     const [showModal, setShowModal] = useState(false);
@@ -42,23 +41,35 @@ const PrintTasks: React.FC<ContainerProps> = ({keycloak}) => {
     };
 
     const confirmTaskHandler = (taskId: string) => {
-        confirmTask(keycloak, apiEndpoint, abortController.signal, taskId);
+        confirmTask(keycloak, abortController.signal, taskId).then(result => setShowModal(false));
     };
 
     useEffect(() => {
         if (!showModal) {
-            getTasks(keycloak, apiEndpoint, abortController.signal).then(response => {
-                abortController.abort();
-                setTasks(response);
-                if (response.length > 0) {
-                    handleModal(true);
-                }
-            });
-            const interval = setInterval(() => {
-                getTasks(keycloak, apiEndpoint, abortController.signal).then(response => {
+            getTasksForCourier(keycloak, abortController.signal, {
+                // @ts-ignore
+                courierId: keycloak.idTokenParsed.sub,
+                is_processing: false
+            }).then(response => {
+                // abortController.abort();
+                if (response !== undefined) {
                     setTasks(response);
                     if (response.length > 0) {
                         handleModal(true);
+                    }
+                }
+            });
+            const interval = setInterval(() => {
+                getTasksForCourier(keycloak, abortController.signal, {
+                    // @ts-ignore
+                    courierId: keycloak.idTokenParsed.sub,
+                    is_processing: false
+                }).then(response => {
+                    if (response !== undefined) {
+                        setTasks(response);
+                        if (response.length > 0) {
+                            handleModal(true);
+                        }
                     }
                 });
             }, 10000);
@@ -77,28 +88,40 @@ const PrintTasks: React.FC<ContainerProps> = ({keycloak}) => {
             <div>
                 <IonContent>
                     <IonModal isOpen={showModal} cssClass='task-approval-popup'>
-                        <h2>New tasks available</h2>
-                        {tasks.map((task: any, i: number) => {
-                            return (
-                                <IonCard key={i}>
-                                    <IonCardHeader>
-                                        <IonCardTitle>
-                                            Task id: {task.id}
-                                        </IonCardTitle>
-                                    </IonCardHeader>
-                                    <IonCardContent>
-                                        Is processing?:
-                                        {task.isProcessing
-                                            ? <IonIcon slot="start" icon={checkmarkOutline}/>
-                                            : <IonIcon icon={closeOutline}/>}
-                                        <IonButton onClick={() => confirmTaskHandler(task["@id"])} color="success">Accept</IonButton>
-                                    </IonCardContent>
-                                </IonCard>
-                            )
-                        })}
-                        <div className="button-wrapper">
-                            <IonProgressBar value={0.5} type="indeterminate" ref={progressElement}></IonProgressBar>
-                        </div>
+                        <IonGrid>
+                            <IonRow className="ion-text-center">
+                                <IonCol size="12" class="ion-align-self-start">
+                                    <h2 className="ion-padding-end">
+                                        New tasks available
+                                    </h2>
+                                </IonCol>
+                                <IonCol size={"12"}>
+                                    {tasks.map((task: any, i: number) => {
+                                        return (
+                                            <IonCard key={i}>
+                                                <IonCardHeader>
+                                                    <IonCardTitle>
+                                                        Task id: {task.id}
+                                                    </IonCardTitle>
+                                                </IonCardHeader>
+                                                <IonCardContent>
+                                                    <p className="ion-padding-bottom">
+                                                        Is processing?:&nbsp;
+                                                        {task.isProcessing
+                                                            ? <>Yes, it is!</>
+                                                            : <>No, it doesn't :(</>}
+                                                    </p>
+                                                    <IonProgressBar value={0.5} type="indeterminate"
+                                                                    ref={progressElement}></IonProgressBar>
+                                                    <IonButton onClick={() => confirmTaskHandler(task["@id"])}
+                                                               expand={"full"}>Accept</IonButton>
+                                                </IonCardContent>
+                                            </IonCard>
+                                        )
+                                    })}
+                                </IonCol>
+                            </IonRow>
+                        </IonGrid>
                     </IonModal>
                 </IonContent>
             </div>
