@@ -1,14 +1,13 @@
 import React, {useEffect, useState, useRef} from 'react';
 // @ts-ignore
 import Leaflet from 'leaflet';
-import {IonButton, IonLoading} from "@ionic/react";
+import {IonLoading} from "@ionic/react";
 // @ts-ignore
 import {Map, TileLayer, Marker, Popup, Circle} from 'react-leaflet';
 import './Geolocation.scss';
 import icon from 'leaflet/dist/images/marker-icon.png';
 import iconShadow from 'leaflet/dist/images/marker-shadow.png';
 import Control from 'react-leaflet-control';
-import {storeLocation} from "../helpers/LocationHelper";
 import {KeycloakInstance} from "keycloak-js";
 
 interface ContainerProps {
@@ -20,8 +19,7 @@ const Geolocation: React.FC<ContainerProps> = ({keycloak}) => {
     const [lng, setlng] = useState<number>(0);
     const [accuracy, setAccuracy] = useState<number>(0);
     const [initialized, setInitialized] = useState(false);
-    const map = useRef(null);
-    const apiEndpoint = (process.env.NODE_ENV === "development" ? "https://api.wimc.localhost" : "https://api.wimc.online");
+    const mapRef = useRef(null);
     const abortController = new AbortController();
 
     const containerStyle = {
@@ -42,20 +40,10 @@ const Geolocation: React.FC<ContainerProps> = ({keycloak}) => {
     });
 
     const resetView = () => {
-        if (null !== map.current) {
+        if (null !== mapRef.current) {
             // @ts-ignore
-            map.current.leafletElement.flyTo([lat, lng], 16);
+            mapRef.current.leafletElement.flyTo([lat, lng], 16);
         }
-    };
-
-    const updatePosition = (newLat: number, newLng: number) => {
-        // @ts-ignore
-        let courierId = keycloak.profile.attributes.courierId[0];
-        storeLocation(keycloak, apiEndpoint, abortController.signal, {
-            courier: courierId,
-            lat: newLat,
-            lng: newLng
-        })
     };
 
     useEffect(() => {
@@ -68,7 +56,6 @@ const Geolocation: React.FC<ContainerProps> = ({keycloak}) => {
                             setlng(position.coords.longitude);
                             setAccuracy(position.coords.accuracy);
                         }
-                        updatePosition(position.coords.latitude, position.coords.longitude);
                     }, (err) => {
                         console.log(err)
                     });
@@ -82,7 +69,7 @@ const Geolocation: React.FC<ContainerProps> = ({keycloak}) => {
                         setAccuracy(position.coords.accuracy);
                     }
                     // @ts-ignore
-                    map.current.leafletElement.flyTo([position.coords.latitude, position.coords.longitude], 16);
+                    mapRef.current.leafletElement.flyTo([position.coords.latitude, position.coords.longitude], 16);
                 }, (err) => {
                     console.log(err)
                 });
@@ -93,10 +80,17 @@ const Geolocation: React.FC<ContainerProps> = ({keycloak}) => {
         }
     }, [initialized]);
 
+    setTimeout(() => {
+        if (mapRef.current) {
+            // @ts-ignore
+            mapRef.current.leafletElement.invalidateSize();
+        }
+    }, 1000);
+
     if (lat != 0 && lng != 0) {
         return (
             <div>
-                <Map center={center} zoom={13} ref={map}>
+                <Map center={center} zoom={13} ref={mapRef}>
                     <TileLayer
                         attribution='&amp;copy <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
                         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"

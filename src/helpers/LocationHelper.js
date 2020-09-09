@@ -1,4 +1,4 @@
-export function storeLocation(keycloak, apiEndpoint, signal, data) {
+export function storeLocation(keycloak, signal, data) {
     const requestOptions = {
         method: 'POST',
         headers: {
@@ -13,7 +13,7 @@ export function storeLocation(keycloak, apiEndpoint, signal, data) {
         }),
         signal: signal
     };
-    return fetch(apiEndpoint + '/positions', requestOptions)
+    return fetch(process.env.REACT_APP_API_ENDPOINT + '/positions', requestOptions)
         .then(results => {
             return results.json();
         }).then(data => {

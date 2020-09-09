@@ -16,15 +16,14 @@ const TaskCenter: React.FC<ContainerProps> = ({keycloak}) => {
     const [courier, setCourier] = useState("");
     const [tasks, setTasks] = useState([]);
     const [couriers, setCouriers] = useState([]);
-    const apiEndpoint = (process.env.NODE_ENV === "development" ? "https://api.wimc.localhost" : "https://api.wimc.online");
     const abortController = new AbortController();
 
     useEffect(() => {
-        getCouriers(keycloak, apiEndpoint, abortController.signal).then(response => setCouriers(response));
-        getTasks(keycloak, apiEndpoint, abortController.signal).then(response => setTasks(response));
+        getCouriers(keycloak, abortController.signal).then(response => setCouriers(response));
+        getTasks(keycloak, abortController.signal).then(response => setTasks(response));
         // const interval = setInterval(() => {
-        //     getTasks(keycloak, apiEndpoint, abortController.signal).then(response => setTasks(response));
-        //     getCouriers(keycloak, apiEndpoint, abortController.signal).then(response => setCouriers(response));
+        //     getTasks(keycloak, abortController.signal).then(response => setTasks(response));
+        //     getCouriers(keycloak, abortController.signal).then(response => setCouriers(response));
         // }, 10000);
         return () => {
             // abortController.abort();
@@ -35,7 +34,7 @@ const TaskCenter: React.FC<ContainerProps> = ({keycloak}) => {
     if (typeof couriers !== undefined && couriers.length > 0) {
         return (
             <div>
-                <PrintTasks tasks={tasks}/>
+                <PrintTasks keycloak={keycloak} />
                 <AddSubTask keycloak={keycloak} tasks={tasks}/>
             </div>
         )
