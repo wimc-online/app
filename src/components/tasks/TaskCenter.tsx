@@ -34,7 +34,7 @@ const TaskCenter: React.FC<ContainerProps> = ({keycloak}) => {
     if (typeof couriers !== undefined && couriers.length > 0) {
         return (
             <div>
-                <PrintTasks tasks={tasks}/>
+                <PrintTasks keycloak={keycloak} />
                 <AddSubTask keycloak={keycloak} tasks={tasks}/>
             </div>
         )

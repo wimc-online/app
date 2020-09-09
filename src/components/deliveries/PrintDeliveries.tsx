@@ -147,16 +147,20 @@ const PrintDeliveries: React.FC<ContainerProps> = ({deliveries, keycloak}) => {
                             </IonCardHeader>
                             <IonCardContent>
                                 Address: {delivery.address} <br/>
+                                {delivery.subtask != undefined
+                                ? <>Is task finished: {delivery.subtask.isFinished ? "YES" : "NO"}</>
+                                : <>Is task finished: Still open - no courier assigned</>
+                                }
                                 {loadMaps
                                     ? <RenderMap lat={delivery.lat} lng={delivery.lng} index={i}/>
                                     : <></>}
-                                {delivery.courier == undefined
+                                {delivery.subtask == undefined || delivery.subtask.task.courier == undefined
                                     ? <>
                                         {couriers.length > 0
                                             ? <RenderForm deliveryId={deliveryId}/>
                                             : <IonCardSubtitle>There are no accessible couriers right now.</IonCardSubtitle>}
                                     </>
-                                    : <RenderAssignedCourier courierId={delivery.courier.id} deliveryId={delivery.id}/>
+                                    : <RenderAssignedCourier courierId={delivery.subtask.task.courier.id} deliveryId={delivery.id}/>
                                 }
 
                             </IonCardContent>

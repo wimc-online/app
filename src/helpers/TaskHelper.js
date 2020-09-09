@@ -68,5 +68,35 @@ export function confirmTask(keycloak, signal, taskId) {
         }).then(data => {
                 console.log(data);
             }
-        )
+        ).catch(err => {
+            if (err.name === 'AbortError') {
+                console.log('Fetch aborted');
+            } else {
+                console.error('Uh oh, an error!', err);
+            }
+        });
+}
+
+export function getSubTasks(keycloak, signal, data) {
+    const requestOptions = {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/merge-patch+json',
+            'Authorization': 'Bearer ' + keycloak.token,
+        },
+        signal: signal
+    };
+    return fetch(process.env.REACT_APP_API_ENDPOINT + '/couriers/' + data.courierId + '/tasks/' + data.taskId + '/subtasks', requestOptions)
+        .then(results => {
+            return results.json();
+        }).then(data => {
+                return data['hydra:member'];
+            }
+        ).catch(err => {
+            if (err.name === 'AbortError') {
+                console.log('Fetch aborted');
+            } else {
+                console.error('Uh oh, an error!', err);
+            }
+        });
 }

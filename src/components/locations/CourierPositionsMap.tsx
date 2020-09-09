@@ -72,7 +72,6 @@ const CourierPositionsMap: React.FC<ContainerProps> = ({couriers}) => {
     const RenderCourierMarker: React.FC<{ positions: any }> = ({positions}) => (
         <>
             {positions.map((position: any, i: number) => {
-                console.log(position);
                 return (
                     <div key={i}>
                         {/*<Popup key={"popup" + i} position={{lat: position.lat, lng: position.lng}}/>*/}
