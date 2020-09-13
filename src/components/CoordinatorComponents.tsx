@@ -7,6 +7,8 @@ import DeliveryCenter from "./deliveries/DeliveryCenter";
 import {IonButton, IonGrid, IonRow, IonCol, CreateAnimation} from '@ionic/react';
 import AddDelivery from "./deliveries/AddDelivery";
 import AssignCourierTutorialModal from "./tutorials/AssignCourierTutorialModal";
+import AddCourierForm from "./couriers/AddCourierForm";
+import CourierPositionsMap from "./locations/CourierPositionsMap";
 
 
 interface ContainerProps {
@@ -97,19 +99,17 @@ function renderSwitch({page, crud}: { page: string, crud?: string, keycloak?: Ke
                 );
             } else {
                 return (
-                    <div>
-                        <IonGrid>
-                            <IonRow>
-                                <AssignCourierTutorialModal />
-                                <IonCol size="12">
-                                    <IonButton routerLink='/page/Deliveries/add' expand="full">Add</IonButton>
-                                </IonCol>
-                                <IonCol size="12">
-                                    <DeliveryCenter keycloak={keycloak}/>
-                                </IonCol>
-                            </IonRow>
-                        </IonGrid>
-                    </div>
+                    <IonGrid>
+                        <IonRow>
+                            <AssignCourierTutorialModal/>
+                            <IonCol size="12">
+                                <IonButton routerLink='/page/Deliveries/add' expand="full">Add</IonButton>
+                            </IonCol>
+                            <IonCol size="12">
+                                <DeliveryCenter keycloak={keycloak}/>
+                            </IonCol>
+                        </IonRow>
+                    </IonGrid>
                 );
             }
         case 'Orders':
@@ -118,12 +118,26 @@ function renderSwitch({page, crud}: { page: string, crud?: string, keycloak?: Ke
                     <TaskCenter keycloak={keycloak}/>
                 </div>
             );
-        case 'Couriers':
+        case 'CouriersMap':
             return (
                 <div>
-                    <CourierCenter keycloak={keycloak}/>
+                    <CourierPositionsMap keycloak={keycloak}/>
                 </div>
             );
+        case 'Couriers':
+            if (crud === "add") {
+                return (
+                    <div>
+                        <AddCourierForm keycloak={keycloak}/>
+                    </div>
+                );
+            } else {
+                return (
+                    <div>
+                        <CourierCenter keycloak={keycloak}/>
+                    </div>
+                );
+            }
         default:
             return 'default';
     }

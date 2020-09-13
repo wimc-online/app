@@ -3,11 +3,12 @@ import {KeycloakInstance} from "keycloak-js";
 import "../../helpers/CourierHelper";
 import {getCouriers, addCourier} from "../../helpers/CourierHelper";
 import {
-    IonButton, IonGrid, IonRow, IonCol, IonAlert
+    IonButton, IonGrid, IonRow, IonCol, IonAlert, IonList, IonListHeader, IonContent, CreateAnimation, IonLoading
 } from "@ionic/react";
 import PrintCouriers from "./PrintCouriers";
 import CourierPositionsMap from "./../locations/CourierPositionsMap";
 import AddCourierForm from './AddCourierForm';
+import PrintCouriersList from "./PrintCouriersList";
 
 interface ContainerProps {
     keycloak: KeycloakInstance;
@@ -15,23 +16,36 @@ interface ContainerProps {
 
 const CourierCenter: React.FC<ContainerProps> = ({keycloak}) => {
     const [couriers, setCouriers] = useState<[]>([]);
+    const [unactiveCouriers, setUnactiveCouriers] = useState<[]>([]);
     const [initialized, setInitialized] = useState(false);
     const abortController = new AbortController();
     const isEqual = require("react-fast-compare");
 
     useEffect(() => {
         if (!initialized) {
-            getCouriers(keycloak, abortController.signal).then(response => {
-                setCouriers(response);
-                setInitialized(true);
+            getCouriers(keycloak, abortController.signal, true).then(response => {
+                if (!isEqual(response, couriers)) {
+                    setCouriers(response);
+                }
+                getCouriers(keycloak, abortController.signal, false).then(response => {
+                    if (!isEqual(response, unactiveCouriers)) {
+                        setUnactiveCouriers(response);
+                    }
+                    setInitialized(true);
+                })
             });
         } else {
             const interval = setInterval(() => {
-                getCouriers(keycloak, abortController.signal).then(response => {
+                getCouriers(keycloak, abortController.signal, true).then(response => {
                     if (response !== undefined) {
                         if (!isEqual(couriers, response)) {
                             setCouriers(response)
                         }
+                        getCouriers(keycloak, abortController.signal, false).then(response => {
+                            if (!isEqual(response, unactiveCouriers)) {
+                                setUnactiveCouriers(response);
+                            }
+                        })
                     }
                 });
             }, 10000);
@@ -45,34 +59,57 @@ const CourierCenter: React.FC<ContainerProps> = ({keycloak}) => {
 
     }, [initialized]);
 
-    const RenderElements = () => {
+    if (initialized) {
         return (
-            <div>
-                <PrintCouriers couriers={couriers}/>
-                <CourierPositionsMap keycloak={keycloak} couriers={couriers}/>
-            </div>
+            <IonGrid>
+                <IonRow>
+                    <IonCol size="12">
+                        <IonButton routerLink='/page/Couriers/add' expand="full">Add Courier</IonButton>
+                        <IonButton routerLink='/page/CouriersMap' expand="full">Show couriers on map</IonButton>
+                    </IonCol>
+                    <IonCol size="12">
+                        {initialized && typeof couriers !== undefined && couriers.length > 0
+                            ?
+                            <IonList className={"ion-margin-bottom"}>
+                                <IonListHeader>
+                                    Available Couriers list
+                                </IonListHeader>
+                                <PrintCouriersList couriers={couriers}/>
+                            </IonList>
+                            :
+                            <IonList className={"ion-margin-bottom"}>
+                                <IonListHeader>
+                                    There are no available couriers yet!
+                                </IonListHeader>
+                            </IonList>
+                        }
+                        {initialized && typeof unactiveCouriers !== undefined && unactiveCouriers.length > 0
+                            ?
+                            <IonList className={"ion-margin-bottom"}>
+                                <IonListHeader>
+                                    Unavailable Couriers list
+                                </IonListHeader>
+                                <PrintCouriersList couriers={unactiveCouriers}/>
+                            </IonList>
+                            :
+                            <IonList className={"ion-margin-bottom"}>
+                                <IonListHeader>
+                                    There are no couriers in the system yet!
+                                </IonListHeader>
+                            </IonList>
+                        }
+                    </IonCol>
+                </IonRow>
+            </IonGrid>
+        )
+    } else {
+        return (
+            <IonLoading
+                isOpen={!initialized}
+                message={'Please wait...'}
+            />
         )
     }
-
-    return (
-        <IonGrid>
-            <IonRow>
-                <IonCol size="12">
-                    <AddCourierForm keycloak={keycloak}/>
-                    {initialized && typeof couriers !== undefined && couriers.length > 0 ?
-                        <RenderElements/>
-                        : <IonAlert
-                            isOpen={true}
-                            cssClass='my-custom-class'
-                            header={'There\'s nothing yet :('}
-                            message={'There are no active couriers at this moment'}
-                            buttons={['Copy that']}
-                        />
-                    }
-                </IonCol>
-            </IonRow>
-        </IonGrid>
-    )
 };
 
 export default CourierCenter;
