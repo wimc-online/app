@@ -101,11 +101,13 @@ function renderSwitch({page, crud}: { page: string, crud?: string, keycloak?: Ke
                 return (
                     <IonGrid>
                         <IonRow>
-                            <AssignCourierTutorialModal/>
-                            <IonCol size="12">
+                            <IonCol size={"12"}>
+                                <AssignCourierTutorialModal/>
+                            </IonCol>
+                            <IonCol size={"12"}>
                                 <IonButton routerLink='/page/Deliveries/add' expand="full">Add</IonButton>
                             </IonCol>
-                            <IonCol size="12">
+                            <IonCol size={"12"}>
                                 <DeliveryCenter keycloak={keycloak}/>
                             </IonCol>
                         </IonRow>
