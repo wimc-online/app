@@ -1,4 +1,4 @@
-export function getCouriers(keycloak, signal) {
+export function getCouriers(keycloak, signal, active) {
     let requestOptions = {
         method: 'GET',
         headers: {
@@ -7,7 +7,7 @@ export function getCouriers(keycloak, signal) {
         },
         signal: signal
     };
-    return fetch(process.env.REACT_APP_API_ENDPOINT + '/couriers?active=true', requestOptions)
+    return fetch(process.env.REACT_APP_API_ENDPOINT + '/couriers?active=' + active, requestOptions)
         .then(results => {
             return results.json();
         }).then(data => {
@@ -22,7 +22,7 @@ export function getCouriers(keycloak, signal) {
         });
 }
 
-export function getCourierPosition(keycloak, signal, courierId) {
+export function getCouriersPosition(keycloak, signal) {
     let requestOptions = {
         method: 'GET',
         headers: {

@@ -35,7 +35,7 @@ const PrintDeliveries: React.FC<ContainerProps> = ({deliveries, keycloak}) => {
     const abortController = new AbortController();
 
     useEffect(() => {
-        getCouriers(keycloak, abortController.signal).then(response => {
+        getCouriers(keycloak, abortController.signal, true).then(response => {
             if (response !== undefined) {
                 setCouriers(response);
             }

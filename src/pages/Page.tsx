@@ -52,7 +52,7 @@ const Page: React.FC = () => {
 
                 <IonContent>
                     {keycloak.hasRealmRole('courier')
-                        ? <CourierComponents page={name}/>
+                        ? <CourierComponents page={name} />
                         : <CoordinatorComponents keycloak={keycloak} page={name} crud={crud}/>}
                 </IonContent>
             </IonPage>

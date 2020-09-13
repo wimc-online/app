@@ -48,8 +48,7 @@ export function getTasksForCourier(keycloak, signal, data) {
 }
 
 export function confirmTask(keycloak, signal, taskId) {
-    // @ts-ignore
-    let courierId = keycloak.profile.attributes.courierId[0];
+    let courierId = keycloak.idTokenParsed.sub;
     const requestOptions = {
         method: 'PATCH',
         headers: {
