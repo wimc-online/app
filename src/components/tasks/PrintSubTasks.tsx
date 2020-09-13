@@ -3,6 +3,7 @@ import {IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonIcon, IonAlert}
 import {checkmarkOutline, closeOutline} from "ionicons/icons";
 import {getSubTasks, getTasks, getTasksForCourier} from "../../helpers/TaskHelper";
 import {KeycloakInstance} from "keycloak-js";
+import RouteSubTask from "./RouteSubTask";
 
 
 interface ContainerProps {
@@ -38,6 +39,7 @@ const PrintSubTasks: React.FC<ContainerProps> = ({keycloak, taskId}) => {
                                 SubTaskID: {subTask.id} <br/>
                                 Destination: {subTask.delivery.address}
                             </p>
+                            <RouteSubTask subtask={subTask}/>
                         </div>
                     )
                 })}

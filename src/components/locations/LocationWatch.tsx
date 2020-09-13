@@ -21,8 +21,11 @@ interface ContainerProps {
 const LocationWatch: React.FC<ContainerProps> = ({keycloak}) => {
     const [initialized, setInitialized] = useState(false);
     const abortController = new AbortController();
+    const ls = require('local-storage');
 
     const updatePosition = (newLat: number, newLng: number) => {
+        ls.set('CourierLat', newLat);
+        ls.set('CourierLng', newLng);
         storeLocation(keycloak, abortController.signal, {
             courier: keycloak.subject,
             lat: newLat,
@@ -41,7 +44,7 @@ const LocationWatch: React.FC<ContainerProps> = ({keycloak}) => {
                     }, (err) => {
                         console.log(err)
                     });
-                }, 5000);
+                }, 10000);
                 return () => clearInterval(interval)
             } else {
                 navigator.geolocation.getCurrentPosition((position) => {

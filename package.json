@@ -20,6 +20,7 @@
     "ionicons": "^5.0.0",
     "keycloak-js": "^9.0.2",
     "leaflet": "^1.6.0",
+    "leaflet-routing-machine": "^3.2.12",
     "local-storage": "^2.0.0",
     "node-sass": "^4.14.1",
     "react": "^16.13.1",

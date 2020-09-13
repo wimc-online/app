@@ -29,24 +29,39 @@ interface ContainerProps {
 
 const PrintDeliveries: React.FC<ContainerProps> = ({deliveries, keycloak}) => {
     const [courier, setCourier] = useState<any>({});
+    const [initialized, setInitialized] = useState<boolean>(false);
     const [delivery, setDelivery] = useState<string>('');
     const [couriers, setCouriers] = useState([]);
     const [loadMaps, setLoadMaps] = useState(false);
     const abortController = new AbortController();
+    const isEqual = require("react-fast-compare");
 
     useEffect(() => {
-        getCouriers(keycloak, abortController.signal, true).then(response => {
-            if (response !== undefined) {
-                setCouriers(response);
-            }
-        });
-        const interval = setInterval(() => {
-        }, 10000);
-        return () => {
-            abortController.abort();
-            clearInterval(interval);
-        };
-    }, []);
+        if (!initialized) {
+            getCouriers(keycloak, abortController.signal, true).then(response => {
+                if (response !== undefined) {
+                    if (!isEqual(response, couriers)) {
+                        setCouriers(response);
+                    }
+                    setInitialized(true);
+                }
+            });
+        } else {
+            const interval = setInterval(() => {
+                getCouriers(keycloak, abortController.signal, true).then(response => {
+                    if (response !== undefined) {
+                        if (!isEqual(response, couriers)) {
+                            setCouriers(response);
+                        }
+                    }
+                });
+            }, 10000);
+            return () => {
+                abortController.abort();
+                clearInterval(interval);
+            };
+        }
+    }, [initialized]);
 
     useEffect(() => {
         setTimeout(() => {
@@ -148,8 +163,8 @@ const PrintDeliveries: React.FC<ContainerProps> = ({deliveries, keycloak}) => {
                             <IonCardContent>
                                 Address: {delivery.address} <br/>
                                 {delivery.subtask != undefined
-                                ? <>Is task finished: {delivery.subtask.isFinished ? "YES" : "NO"}</>
-                                : <>Is task finished: Still open - no courier assigned</>
+                                    ? <>Is task finished: {delivery.subtask.isFinished ? "YES" : "NO"}</>
+                                    : <>Is task finished: Still open - no courier assigned</>
                                 }
                                 {loadMaps
                                     ? <RenderMap lat={delivery.lat} lng={delivery.lng} index={i}/>
@@ -158,9 +173,11 @@ const PrintDeliveries: React.FC<ContainerProps> = ({deliveries, keycloak}) => {
                                     ? <>
                                         {couriers.length > 0
                                             ? <RenderForm deliveryId={deliveryId}/>
-                                            : <IonCardSubtitle>There are no accessible couriers right now.</IonCardSubtitle>}
+                                            : <IonCardSubtitle>There are no accessible couriers right
+                                                now.</IonCardSubtitle>}
                                     </>
-                                    : <RenderAssignedCourier courierId={delivery.subtask.task.courier.id} deliveryId={delivery.id}/>
+                                    : <RenderAssignedCourier courierId={delivery.subtask.task.courier.id}
+                                                             deliveryId={delivery.id}/>
                                 }
 
                             </IonCardContent>

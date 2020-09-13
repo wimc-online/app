@@ -87,7 +87,6 @@ const CourierPositionsMap: React.FC<ContainerProps> = ({keycloak}) => {
         }, 1000);
 
         const RenderCourierMarker: React.FC<{ positions: any }> = ({positions}) => {
-            console.log(positions);
             if (positions !== undefined) {
                 return (
                     <>
@@ -108,7 +107,6 @@ const CourierPositionsMap: React.FC<ContainerProps> = ({keycloak}) => {
         }
 
         if (initialized) {
-            console.log(positions);
             return (
                 <div>
                     <Map center={center} zoom={13} ref={mapRef} scrollWheelZoom={false}>
