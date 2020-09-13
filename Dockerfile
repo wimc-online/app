@@ -18,7 +18,7 @@ RUN set -x \
 
 COPY --chown=node public $APP_ROOT/public
 COPY --chown=node src $APP_ROOT/src
-COPY --chown=node capacitor.config.json ionic.config.json tsconfig.json $APP_ROOT/
+COPY --chown=node capacitor.config.json ionic.config.json tsconfig.json .env $APP_ROOT/
 RUN set -x \
  && ionic --no-interactive build --prod
 
