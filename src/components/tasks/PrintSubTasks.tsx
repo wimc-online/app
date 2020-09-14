@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
-import {IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonIcon, IonAlert} from "@ionic/react";
+import {IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonIcon, IonAlert, IonButton} from "@ionic/react";
 import {checkmarkOutline, closeOutline} from "ionicons/icons";
-import {getSubTasks, getTasks, getTasksForCourier} from "../../helpers/TaskHelper";
+import {finishSubTask, getSubTasks, getTasks, getTasksForCourier} from "../../helpers/TaskHelper";
 import {KeycloakInstance} from "keycloak-js";
 import RouteSubTask from "./RouteSubTask";
 
@@ -16,6 +16,11 @@ const PrintSubTasks: React.FC<ContainerProps> = ({keycloak, taskId}) => {
     const [subTasks, setSubTasks] = useState<any>({});
     const [initialized, setInitialized] = useState(false);
     const abortController = new AbortController();
+
+    const finishSubTaskAction = (subTaskId: string) => {
+        finishSubTask(keycloak, abortController.signal, subTaskId);
+    }
+
     useEffect(() => {
         if (!initialized) {
             getSubTasks(keycloak, abortController.signal, {
@@ -39,7 +44,14 @@ const PrintSubTasks: React.FC<ContainerProps> = ({keycloak, taskId}) => {
                                 SubTaskID: {subTask.id} <br/>
                                 Destination: {subTask.delivery.address}
                             </p>
-                            <RouteSubTask subtask={subTask}/>
+                            {!subTask.isFinished
+                                ?
+                                <>
+                                    <IonButton expand={"full"} onClick={() => finishSubTaskAction(subTask.id)}>Finish
+                                        task</IonButton>
+                                    <RouteSubTask subtask={subTask}/>
+                                </>
+                                : <></>}
                         </div>
                     )
                 })}

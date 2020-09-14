@@ -4,6 +4,7 @@ import TaskApprovalPopup from "./tasks/TaskApprovalPopup";
 import keycloak from "../keycloak";
 import LocationWatch from "./locations/LocationWatch";
 import PrintTasks from "./tasks/PrintTasks";
+import {IonCol, IonGrid, IonRow} from "@ionic/react";
 
 interface ContainerProps {
     page: string
@@ -20,15 +21,23 @@ function renderSwitch({page}: { page: string }) {
             );
         case 'Orders':
             return (
-                <div>
-                    <PrintTasks keycloak={keycloak}/>
-                </div>
+                <IonGrid>
+                    <IonRow>
+                        <IonCol size="12">
+                            <PrintTasks keycloak={keycloak} active={true} key={1}/>
+                        </IonCol>
+                    </IonRow>
+                </IonGrid>
             );
         case 'History':
             return (
-                <div>
-                    <h2>Not yet implemented!</h2>
-                </div>
+                <IonGrid>
+                    <IonRow>
+                        <IonCol size="12">
+                            <PrintTasks keycloak={keycloak} active={false} key={2}/>
+                        </IonCol>
+                    </IonRow>
+                </IonGrid>
             );
         default:
             return 'default';
