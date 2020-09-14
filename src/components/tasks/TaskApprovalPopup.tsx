@@ -49,7 +49,8 @@ const PrintTasks: React.FC<ContainerProps> = ({keycloak}) => {
             getTasksForCourier(keycloak, abortController.signal, {
                 // @ts-ignore
                 courierId: keycloak.idTokenParsed.sub,
-                is_processing: false
+                isProcessing: false,
+                isFinished: false
             }).then(response => {
                 // abortController.abort();
                 if (response !== undefined) {
@@ -63,7 +64,8 @@ const PrintTasks: React.FC<ContainerProps> = ({keycloak}) => {
                 getTasksForCourier(keycloak, abortController.signal, {
                     // @ts-ignore
                     courierId: keycloak.idTokenParsed.sub,
-                    is_processing: false
+                    isProcessing: false,
+                    isFinished: false
                 }).then(response => {
                     if (response !== undefined) {
                         setTasks(response);
