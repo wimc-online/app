@@ -1,17 +1,11 @@
 import React, {useEffect, useState, useRef} from 'react';
 // @ts-ignore
-import Leaflet from 'leaflet';
-import {IonButton, IonLoading} from "@ionic/react";
+import {IonLoading} from "@ionic/react";
 // @ts-ignore
-import {Map, TileLayer, Marker, Popup, Circle} from 'react-leaflet';
-import icon from 'leaflet/dist/images/marker-icon.png';
-import iconShadow from 'leaflet/dist/images/marker-shadow.png';
-import Control from 'react-leaflet-control';
-import {storeLocation} from "../../helpers/LocationHelper";
+import {Map, TileLayer} from 'react-leaflet';
 import {KeycloakInstance} from "keycloak-js";
-import {getUserDetailedData} from "../../helpers/KeycloakHelper";
 import {getCouriers} from "../../helpers/CourierHelper";
-import keycloak from "../../keycloak";
+import RenderCourierMarker from './RenderCourierMarker';
 
 interface ContainerProps {
     keycloak: KeycloakInstance,
@@ -19,7 +13,7 @@ interface ContainerProps {
 
 const CourierPositionsMap: React.FC<ContainerProps> = ({keycloak}) => {
         const [couriers, setCouriers] = useState([]);
-        const [positions, setPositions] = useState<any>({});
+        const [positions, setPositions] = useState({});
         const [initialized, setInitialized] = useState(false);
         const mapRef = useRef(null);
         const abortController = new AbortController();
@@ -29,29 +23,35 @@ const CourierPositionsMap: React.FC<ContainerProps> = ({keycloak}) => {
             lng: 19.938
         };
 
-        const lookUpForCouriers = () => {
-
-        }
         useEffect(() => {
             if (!initialized) {
                 getCouriers(keycloak, abortController.signal, true).then(response => {
                     setCouriers(response);
                     if (response.length > 0) {
+                        let positionHelperArray = {};
                         response.map((courier: any, i: number) => {
-                            setPositions({[`${courier.id}`]: courier.lastPosition})
+                            // @ts-ignore
+                            positionHelperArray[courier.id] = courier.lastPosition
+                            if (Object.keys(positionHelperArray).length === response.length) {
+                                setPositions(positionHelperArray);
+                                setInitialized(true);
+                            }
                         });
-                        setInitialized(true);
                     }
                 })
             } else {
                 const interval = setInterval(() => {
                     getCouriers(keycloak, abortController.signal, true).then(response => {
                         setCouriers(response);
-                        if (response.length > 0) {
-                            response.map((courier: any, i: number) => {
-                                setPositions({[`${courier.id}`]: `${courier.lastPosition}`})
-                            });
-                        }
+                        let positionHelperArray = {};
+                        response.map((courier: any, i: number) => {
+                            // @ts-ignore
+                            positionHelperArray[courier.id] = courier.lastPosition
+                            if (Object.keys(positionHelperArray).length === response.length) {
+                                setPositions(positionHelperArray);
+                                setInitialized(true);
+                            }
+                        });
                     })
                 }, 10000);
                 return () => {
@@ -63,21 +63,6 @@ const CourierPositionsMap: React.FC<ContainerProps> = ({keycloak}) => {
             }
         }, [initialized]);
 
-        let DefaultIcon = Leaflet.icon({
-            iconUrl: icon,
-            shadowUrl: iconShadow,
-            iconSize: [24, 36],
-            iconAnchor: [12, 36]
-        });
-
-        const resetView = () => {
-            if (null !== mapRef.current) {
-                // @ts-ignore
-                mapRef.current.leafletElement.flyTo([lat, lng], 16);
-            }
-        };
-
-        const fakedCourierLocations = {}
 
         setTimeout(() => {
             if (mapRef.current) {
@@ -85,26 +70,6 @@ const CourierPositionsMap: React.FC<ContainerProps> = ({keycloak}) => {
                 mapRef.current.leafletElement.invalidateSize();
             }
         }, 1000);
-
-        const RenderCourierMarker: React.FC<{ positions: any }> = ({positions}) => {
-            if (positions !== undefined) {
-                return (
-                    <>
-                        {positions.map((position: any, i: number) => {
-                            return (
-                                <div key={i}>
-                                    {/*<Popup key={"popup" + i} position={{lat: position.lat, lng: position.lng}}/>*/}
-                                    <Marker position={{lat: position.lat, lng: position.lng}} title={position.courier.id}
-                                            icon={DefaultIcon}/>
-                                </div>
-                            )
-                        })}
-                    </>
-                )
-            } else {
-                return (<></>)
-            }
-        }
 
         if (initialized) {
             return (
@@ -114,15 +79,10 @@ const CourierPositionsMap: React.FC<ContainerProps> = ({keycloak}) => {
                             attribution='&amp;copy <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
                             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                         />
-                        {positions !== undefined
+                        {positions !== undefined && Object.keys(positions).length > 0
                             ? <RenderCourierMarker positions={positions}/>
                             : <></>
                         }
-                        {/*<Control position="topleft">*/}
-                        {/*    <button onClick={() => resetView()}>*/}
-                        {/*        Reset View*/}
-                        {/*    </button>*/}
-                        {/*</Control>*/}
                     </Map>
                 </div>
             )
