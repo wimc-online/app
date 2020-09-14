@@ -23,7 +23,8 @@ export function getTasks(keycloak, signal) {
 
 export function getTasksForCourier(keycloak, signal, data) {
     const getParams = new URLSearchParams({
-        is_processing: data.isProcessing
+        is_processing: data.isProcessing,
+        is_finished: data.isFinished
     });
     const requestOptions = {
         method: 'GET',
