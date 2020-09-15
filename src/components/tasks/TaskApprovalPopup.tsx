@@ -16,6 +16,7 @@ import {getTasks, confirmTask, getTasksForCourier} from "../../helpers/TaskHelpe
 import {getDeliveries} from "../../helpers/DeliveryHelper";
 import {KeycloakInstance} from "keycloak-js";
 import "./TaskApprovalPopup.scss";
+import {useHistory} from "react-router";
 
 
 interface ContainerProps {
@@ -27,6 +28,7 @@ const PrintTasks: React.FC<ContainerProps> = ({keycloak}) => {
     const abortController = new AbortController();
     const [showModal, setShowModal] = useState(false);
     const progressElement = useRef() as MutableRefObject<HTMLIonProgressBarElement>;
+    const history = useHistory();
 
     const handleModal = (enable: boolean) => {
         if (enable) {
@@ -41,7 +43,10 @@ const PrintTasks: React.FC<ContainerProps> = ({keycloak}) => {
     };
 
     const confirmTaskHandler = (taskId: string) => {
-        confirmTask(keycloak, abortController.signal, taskId).then(result => setShowModal(false));
+        confirmTask(keycloak, abortController.signal, taskId).then(result => {
+            setShowModal(false);
+            history.push('/page/Orders');
+        });
     };
 
     useEffect(() => {
