@@ -4,7 +4,7 @@ import {checkmarkOutline, closeOutline} from "ionicons/icons";
 import {finishSubTask, getSubTasks, getTasks, getTasksForCourier} from "../../helpers/TaskHelper";
 import {KeycloakInstance} from "keycloak-js";
 import RouteSubTask from "./RouteSubTask";
-
+import {useHistory} from "react-router";
 
 interface ContainerProps {
     keycloak: KeycloakInstance,
@@ -16,9 +16,13 @@ const PrintSubTasks: React.FC<ContainerProps> = ({keycloak, taskId}) => {
     const [subTasks, setSubTasks] = useState<any>({});
     const [initialized, setInitialized] = useState(false);
     const abortController = new AbortController();
+    const history = useHistory();
 
     const finishSubTaskAction = (subTaskId: string) => {
-        finishSubTask(keycloak, abortController.signal, subTaskId);
+        finishSubTask(keycloak, abortController.signal, subTaskId).then(result => {
+                history.push('/page/Dashboard')
+            }
+        );
     }
 
     useEffect(() => {
